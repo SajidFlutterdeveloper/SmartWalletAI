@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">سمارٹ والٹ AI</string>
+    <string name="welcome_urdu">خوش آمدید! اپنے اخراجات یہاں درج کریں۔</string>
+    <string name="voice_prompt_urdu">بولیں: "میں نے 500 کا پٹرول لیا"</string>
+    <string name="scan_receipt">رسید اسکین کریں</string>
+    <string name="save_sync">محفوظ اور سنک کریں</string>
+    <string name="total_spent">کل خرچ</string>
+    <string name="remaining">باقی بجٹ</string>
+    <string name="add_expense">نیا خرچہ شامل کریں</string>
+</resources>

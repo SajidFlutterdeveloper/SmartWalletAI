@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "338267613995",
+    "project_id": "fir-app-f24e6",
+    "storage_bucket": "fir-app-f24e6.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:338267613995:android:f7d0383bd4bf489eeaf36e",
+        "android_client_info": {
+          "package_name": "com.smartwallet.ai.ui"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCtdpP7nNw6fKWS6aKbT4Ldt_DRv3-6bNg"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

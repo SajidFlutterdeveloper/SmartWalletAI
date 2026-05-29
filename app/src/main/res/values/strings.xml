@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">SmartWallet AI</string>
+    <string name="welcome_urdu">خوش آمدید! اپنے اخراجات یہاں درج کریں۔</string>
+    <string name="voice_prompt_urdu">بولیں: "میں نے پٹرول لیا"</string>
+    <string name="scan_receipt">رسید اسکین کریں</string>
+    <string name="save_sync">محفوظ اور سنک کریں</string>
+    <string name="total_spent">Total Spent</string>
+    <string name="remaining">Remaining Budget</string>
+    <string name="add_expense">Add New Expense</string>
+    <string name="default_web_client_id">338267613995-xxxxxxxxxxxx.apps.googleusercontent.com</string>
+</resources>
