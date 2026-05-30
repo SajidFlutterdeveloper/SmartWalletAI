@@ -143,15 +143,15 @@ class DashboardFragment : Fragment() {
             if (imgFile.exists()) {
                 Glide.with(this)
                     .load(imgFile)
-                    .placeholder(android.R.drawable.ic_menu_preferences)
-                    .error(android.R.drawable.ic_menu_preferences)
-                    .centerCrop()
+                    .placeholder(R.drawable.ic_wallet_ai_logo)
+                    .error(R.drawable.ic_wallet_ai_logo)
+                    .circleCrop()
                     .into(binding.btnSettings)
             } else {
-                binding.btnSettings.setImageResource(android.R.drawable.ic_menu_preferences)
+                binding.btnSettings.setImageResource(R.drawable.ic_wallet_ai_logo)
             }
         } else {
-            binding.btnSettings.setImageResource(android.R.drawable.ic_menu_preferences)
+            binding.btnSettings.setImageResource(R.drawable.ic_wallet_ai_logo)
         }
     }
 

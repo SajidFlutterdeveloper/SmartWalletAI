@@ -10,24 +10,29 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
 import com.google.firebase.auth.FirebaseAuth
+import com.smartwallet.ai.data.model.AIInsightData
 import com.smartwallet.ai.databinding.FragmentProfileBinding
+import com.smartwallet.ai.ui.viewmodel.ExpenseViewModel
 import com.smartwallet.ai.utils.PreferenceManager
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 class ProfileFragment : Fragment() {
 
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var preferenceManager: PreferenceManager
+    private val viewModel: ExpenseViewModel by viewModels()
     private val auth by lazy { FirebaseAuth.getInstance() }
-    // private var isUploadInProgress = false // Removed as it's no longer needed for local storage
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,29 +49,48 @@ class ProfileFragment : Fragment() {
         preferenceManager = PreferenceManager(requireContext())
         loadProfileData()
         setupListeners()
+        setupObservers()
+        animateUI()
+    }
+
+    private fun animateUI() {
+        binding.cardHeader.translationY = -300f
+        binding.cardHeader.animate().translationY(0f).setDuration(600).setInterpolator(DecelerateInterpolator()).start()
+        
+        binding.layoutAiSummary.alpha = 0f
+        binding.layoutAiSummary.animate().alpha(1f).setStartDelay(400).setDuration(600).start()
+        
+        binding.layoutForm.alpha = 0f
+        binding.layoutForm.translationY = 100f
+        binding.layoutForm.animate().alpha(1f).translationY(0f).setStartDelay(600).setDuration(600).start()
     }
 
     private fun loadProfileData() {
-        if (preferenceManager.isProfileCompleted()) {
-            binding.etName.setText(preferenceManager.getUserName())
-            binding.etMobile.setText(preferenceManager.getMobileNumber())
-            binding.etIncome.setText(preferenceManager.getMonthlyIncome().toString())
-            binding.etSavingsGoal.setText(preferenceManager.getSavingsGoal().toString())
-            binding.switchBiometric.isChecked = preferenceManager.isBiometricEnabled()
-            
-            val profileUrl = preferenceManager.getProfilePicUrl()
-            if (!profileUrl.isNullOrEmpty()) {
+        val name = preferenceManager.getUserName()
+        binding.etName.setText(name)
+        binding.tvDisplayUserName.text = name
+        binding.etIncome.setText(preferenceManager.getMonthlyIncome().toString())
+        binding.etSavingsGoal.setText(preferenceManager.getSavingsGoal().toString())
+        binding.switchBiometric.isChecked = preferenceManager.isBiometricEnabled()
+        
+        updateProfileImage()
+    }
+
+    private fun updateProfileImage() {
+        val profileUrl = preferenceManager.getProfilePicUrl()
+        if (!profileUrl.isNullOrEmpty()) {
+            val file = File(profileUrl)
+            if (file.exists()) {
                 Glide.with(this)
-                    .load(profileUrl)
-                    .placeholder(android.R.drawable.ic_menu_camera)
-                    .error(android.R.drawable.ic_menu_report_image)
+                    .load(file)
+                    .centerCrop()
                     .into(binding.ivProfilePic)
             }
         }
     }
 
     private fun setupListeners() {
-        binding.ivProfilePic.setOnClickListener {
+        binding.fabEditPhoto.setOnClickListener {
             requestPermissionAndPickImage()
         }
 
@@ -81,6 +105,28 @@ class ProfileFragment : Fragment() {
         }
     }
 
+    private fun setupObservers() {
+        val income = preferenceManager.getMonthlyIncome()
+        val goal = preferenceManager.getSavingsGoal()
+        
+        viewModel.calculateInsights(income, goal)
+        viewModel.advancedInsights.observe(viewLifecycleOwner) { data ->
+            updateAiQuickSummary(data)
+        }
+    }
+
+    private fun updateAiQuickSummary(data: AIInsightData) {
+        binding.tvQuickHealth.text = String.format(Locale.getDefault(), "%d%%", data.healthScore)
+        binding.tvQuickScore.text = (data.healthScore * 10).toString()
+        binding.tvUserPersonalityTag.text = data.financialPersonality.name.replace("_", " ").lowercase()
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        
+        val calendar = Calendar.getInstance()
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+        binding.tvQuickDays.text = (daysInMonth - currentDay).toString()
+    }
+
     private fun requestPermissionAndPickImage() {
         val permission = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
             Manifest.permission.READ_MEDIA_IMAGES
@@ -89,80 +135,52 @@ class ProfileFragment : Fragment() {
         }
 
         if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted, open image picker
             imagePickerLauncher.launch("image/*")
         } else {
-            // Request permission
             permissionLauncher.launch(permission)
         }
     }
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            // Permission granted, open image picker
-            imagePickerLauncher.launch("image/*")
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Permission denied. Cannot access gallery.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        if (isGranted) imagePickerLauncher.launch("image/*")
+        else Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
     }
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            saveProfileImageLocally(uri)
-        } else {
-            Toast.makeText(requireContext(), "No image selected", Toast.LENGTH_SHORT).show()
-        }
+        uri?.let { saveProfileImageLocally(it) }
     }
 
     private fun saveProfileImageLocally(uri: Uri) {
         try {
             val inputStream = requireContext().contentResolver.openInputStream(uri)
-            if (inputStream != null) {
+            inputStream?.use { input ->
                 val directory = File(requireContext().filesDir, "profile_pics")
-                if (!directory.exists()) {
-                    directory.mkdirs()
-                }
+                if (!directory.exists()) directory.mkdirs()
 
                 val file = File(directory, "profile_picture.jpg")
-                val outputStream = FileOutputStream(file)
-                inputStream.copyTo(outputStream)
-                inputStream.close()
-                outputStream.close()
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
+                }
 
-                val localPath = file.absolutePath
-                preferenceManager.setProfilePicUrl(localPath)
-
-                Glide.with(this)
-                    .load(file)
-                    .centerCrop()
-                    .into(binding.ivProfilePic)
-
-                Toast.makeText(requireContext(), "Profile picture updated locally!", Toast.LENGTH_SHORT).show()
+                preferenceManager.setProfilePicUrl(file.absolutePath)
+                updateProfileImage()
+                Toast.makeText(requireContext(), "Photo updated everywhere!", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Log.e("ProfileLocal", "Error saving image: ${e.message}", e)
-            Toast.makeText(requireContext(), "Failed to save image: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e("Profile", "Error saving image", e)
         }
     }
 
     private fun saveData() {
         val name = binding.etName.text.toString()
-        val mobile = binding.etMobile.text.toString()
         val income = binding.etIncome.text.toString().toDoubleOrNull() ?: 0.0
-        val savingsGoal = binding.etSavingsGoal.text.toString().toDoubleOrNull() ?: 0.0
-        val biometric = binding.switchBiometric.isChecked
-
+        val goal = binding.etSavingsGoal.text.toString().toDoubleOrNull() ?: 0.0
+        
         if (name.isNotEmpty() && income > 0) {
-            preferenceManager.saveProfile(name, mobile, income, savingsGoal, 1, "PKR")
-            preferenceManager.setBiometricEnabled(biometric)
-            
-            Toast.makeText(requireContext(), "Profile Updated Successfully!", Toast.LENGTH_SHORT).show()
-        } else {
-            Toast.makeText(requireContext(), "Please enter name and monthly income", Toast.LENGTH_SHORT).show()
+            preferenceManager.saveProfile(name, "", income, goal, 1, "PKR")
+            preferenceManager.setBiometricEnabled(binding.switchBiometric.isChecked)
+            binding.tvDisplayUserName.text = name
+            Toast.makeText(requireContext(), "Profile Synchronized!", Toast.LENGTH_SHORT).show()
         }
     }
 
@@ -171,4 +189,3 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 }
-

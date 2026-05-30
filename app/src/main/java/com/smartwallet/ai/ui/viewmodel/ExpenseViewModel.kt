@@ -21,6 +21,7 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     val allExpenses: LiveData<List<Expense>>
     val totalExpenses: LiveData<Double?>
     val aiInsights = MutableLiveData<List<String>>()
+    val advancedInsights = MutableLiveData<com.smartwallet.ai.data.model.AIInsightData>()
     private val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     private val preferenceManager = PreferenceManager(application)
 
@@ -80,5 +81,6 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     fun calculateInsights(monthlyIncome: Double, savingsGoal: Double) {
         val currentExpenses = allExpenses.value ?: emptyList()
         aiInsights.value = com.smartwallet.ai.utils.AIInsightEngine.generateInsights(currentExpenses, monthlyIncome, savingsGoal)
+        advancedInsights.value = com.smartwallet.ai.utils.AIInsightEngine.generateAdvancedInsights(currentExpenses, monthlyIncome, savingsGoal)
     }
 }

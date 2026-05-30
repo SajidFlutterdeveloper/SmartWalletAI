@@ -37,6 +37,7 @@
         <activity android:name=".ui.SignupActivity" />
         <activity android:name=".ui.StatementActivity" />
         <activity android:name=".ui.ReceiptActivity" />
+        <activity android:name=".ui.ChatActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"
