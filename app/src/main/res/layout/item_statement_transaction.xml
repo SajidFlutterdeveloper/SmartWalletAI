@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="horizontal"
+    android:paddingVertical="10dp"
+    android:paddingHorizontal="4dp"
+    android:weightSum="10"
+    android:gravity="center_vertical">
+
+    <TextView
+        android:id="@+id/tvStDate"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2.5"
+        android:text="27 Oct"
+        android:textSize="12sp"
+        android:textColor="@color/text_secondary"/>
+
+    <TextView
+        android:id="@+id/tvStNote"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="5"
+        android:text="Grocery Shopping"
+        android:textColor="@color/text_main"
+        android:textSize="12sp"
+        android:maxLines="1"
+        android:ellipsize="end"
+        android:paddingEnd="8dp"/>
+
+    <TextView
+        android:id="@+id/tvStAmount"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="2.5"
+        android:text="500.00"
+        android:textColor="@color/text_main"
+        android:textSize="12sp"
+        android:textStyle="bold"
+        android:gravity="end"/>
+
+</LinearLayout>

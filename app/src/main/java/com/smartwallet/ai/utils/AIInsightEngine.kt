@@ -1,60 +1,85 @@
 package com.smartwallet.ai.utils
 
 import com.smartwallet.ai.data.model.Expense
-import java.util.Locale
+import java.util.*
 
 object AIInsightEngine {
 
     fun generateInsights(expenses: List<Expense>, monthlyIncome: Double, savingsGoal: Double): List<String> {
         val insights = mutableListOf<String>()
+        val locale = Locale.getDefault()
         
         if (expenses.isEmpty()) return listOf("Welcome! Start adding expenses so I can help you manage your wealth and wellness.")
 
-        val totalSpent = expenses.sumOf { it.amount }
-        val categoryTotals = expenses.groupBy { it.category }
+        val cal = Calendar.getInstance()
+        val currentMonth = cal.get(Calendar.MONTH)
+        val currentYear = cal.get(Calendar.YEAR)
+        
+        cal.add(Calendar.MONTH, -1)
+        val prevMonth = cal.get(Calendar.MONTH)
+        val prevYear = cal.get(Calendar.YEAR)
+
+        val currentExpenses = expenses.filter { 
+            val eCal = Calendar.getInstance().apply { timeInMillis = it.date }
+            eCal.get(Calendar.MONTH) == currentMonth && eCal.get(Calendar.YEAR) == currentYear
+        }
+
+        val prevExpenses = expenses.filter { 
+            val eCal = Calendar.getInstance().apply { timeInMillis = it.date }
+            eCal.get(Calendar.MONTH) == prevMonth && eCal.get(Calendar.YEAR) == prevYear
+        }
+
+        val totalSpent = currentExpenses.sumOf { it.amount }
+        val prevTotalSpent = prevExpenses.sumOf { it.amount }
+        val categoryTotals = currentExpenses.groupBy { it.category }
             .mapValues { entry -> entry.value.sumOf { it.amount } }
 
+        // 1. Month-over-Month Comparison (Bachat Focus)
+        if (prevTotalSpent > 0) {
+            val savingsDiff = prevTotalSpent - totalSpent
+            if (savingsDiff > 0) {
+                insights.add("🌟 Bachat King/Queen: You have saved PKR ${String.format(locale, "%.0f", savingsDiff)} more than last month! This is great financial progress.")
+            } else if (savingsDiff < 0) {
+                insights.add("📈 Alert: You are spending PKR ${String.format(locale, "%.0f", Math.abs(savingsDiff))} more than last month. Let's look at which category is causing this.")
+            }
+        }
+
+        // 2. Savings Goal Analysis
         val remainingBudget = monthlyIncome - savingsGoal - totalSpent
-
-        // 1. Savings Goal Analysis
         if (totalSpent > (monthlyIncome - savingsGoal)) {
-            insights.add("⚠️ Goal Alert: Your spending is affecting your savings goal of ${String.format(Locale.getDefault(), "%.0f", savingsGoal)}. Try to reduce unnecessary expenses.")
-        } else {
-            insights.add("✅ On Track: You are doing great! You are moving steadily towards your savings goal.")
+            insights.add("⚠️ Goal Alert: You've crossed your savings threshold. Every rupee saved now is a step back to your goal!")
         }
 
-        // 2. Budget Warning
-        if (remainingBudget < 0) {
-            insights.add("🔴 Critical: You have exceeded your financial capacity this month. Please review your 'Shopping' and 'Entertainment' categories.")
-        } else if (remainingBudget < monthlyIncome * 0.1) {
-            insights.add("🟡 Warning: You are close to exceeding your monthly budget. Be careful with new purchases.")
+        // 3. Category Leaks (Business/Mindful Analysis)
+        categoryTotals.forEach { (category, amount) ->
+            val percentage = (amount / totalSpent) * 100
+            if (percentage > 30 && totalSpent > 5000) {
+                insights.add("📊 Strategy: Your spending on '$category' is ${String.format(locale, "%.1f", percentage)}% of your total. Reducing this by just 10% could increase your savings significantly.")
+            }
         }
 
-        // 3. Health & Wellness (Food Habits)
-        val foodSpent = categoryTotals["Food"] ?: 0.0
-        if (foodSpent > monthlyIncome * 0.2) {
-            insights.add("🍔 Wellness: You are spending a lot on outside food. This affects both your health and savings. Cooking at home could save you significantly.")
-        }
-
-        // 4. Mental Wellness (Stress/Impulsive Spending)
-        val shoppingSpent = categoryTotals["Shopping"] ?: 0.0
-        if (shoppingSpent > monthlyIncome * 0.15) {
-            insights.add("🧘 Mindful Spending: Your shopping expenses are high this week. Sometimes we shop when stressed. Take a deep breath and ask if you really need it.")
-        }
-
-        // 5. Motivational Guidance
-        if (totalSpent < monthlyIncome * 0.5 && expenses.size > 5) {
-            insights.add("🌟 Discipline: Your financial discipline is impressive! Small savings today create a stress-free future.")
-        } else {
-            insights.add("💡 Motivation: Financial discipline can significantly reduce mental stress. You have the power to control your future.")
-        }
-
-        // 6. Specific Category Insights
+        // 4. Transport & Wellness (Practical Saving)
         val fuelSpent = categoryTotals["Fuel"] ?: 0.0
         if (fuelSpent > monthlyIncome * 0.1) {
-            insights.add("🚗 Transport: Fuel costs are rising. Consider carpooling or planning trips better to save more.")
+            insights.add("🚗 Transport: Fuel costs are rising. Carpooling this week could save you approx. PKR ${String.format(locale, "%.0f", fuelSpent * 0.2)}.")
         }
 
-        return insights
+        val foodSpent = categoryTotals["Food"] ?: 0.0
+        if (foodSpent > monthlyIncome * 0.2) {
+            insights.add("🥗 Health & Wealth: High food spending detected. Meal prepping is not just healthy but also a 'Bachat' strategy for smart people.")
+        }
+
+        // 5. Impulsive Spending (Psychological Analysis)
+        val shoppingSpent = categoryTotals["Shopping"] ?: 0.0
+        if (shoppingSpent > monthlyIncome * 0.15) {
+            insights.add("🧘 Mindfulness: Your shopping is high. Businessman's Tip: Delay non-essential purchases for 24 hours. Most impulses fade away!")
+        }
+
+        // 6. Final Surplus Advice
+        if (remainingBudget > 0) {
+            insights.add("💰 Smart Move: You have a surplus of PKR ${String.format(locale, "%.0f", remainingBudget)}. Moving this to a profit-bearing account now will grow your wealth.")
+        }
+
+        return if (insights.isEmpty()) listOf("You're doing great! Keep tracking to unlock deeper AI insights.") else insights
     }
 }

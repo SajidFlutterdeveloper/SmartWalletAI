@@ -2,6 +2,7 @@ package com.smartwallet.ai.data.model
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
+import java.io.Serializable
 
 @Entity(tableName = "expenses")
 data class Expense(
@@ -15,4 +16,4 @@ data class Expense(
     val date: Long = System.currentTimeMillis(), // Stores date and time
     val inputMethod: String = "Manual", // "Voice", "Scan", or "Manual"
     val isSynced: Boolean = false
-)
+) : Serializable

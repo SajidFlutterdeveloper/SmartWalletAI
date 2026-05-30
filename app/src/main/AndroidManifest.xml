@@ -35,6 +35,8 @@
         <activity android:name=".ui.InsightsActivity" />
         <activity android:name=".ui.ProfileActivity" />
         <activity android:name=".ui.SignupActivity" />
+        <activity android:name=".ui.StatementActivity" />
+        <activity android:name=".ui.ReceiptActivity" />
 
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -1,0 +1,14 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="240dp"
+    android:viewportWidth="360"
+    android:viewportHeight="240">
+    <!-- Darker blue bottom layer -->
+    <path
+        android:fillColor="#0D47A1"
+        android:pathData="M0,180 C100,150 200,240 360,180 L360,240 L0,240 Z" />
+    <!-- Main blue wave layer -->
+    <path
+        android:fillColor="#1E88E5"
+        android:pathData="M0,140 C80,110 280,210 360,140 L360,240 L0,240 Z" />
+</vector>

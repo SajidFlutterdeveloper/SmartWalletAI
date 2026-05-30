@@ -1,0 +1,27 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="120dp"
+    android:height="120dp"
+    android:viewportWidth="120"
+    android:viewportHeight="120">
+    <!-- Main Wallet Body -->
+    <path
+        android:fillColor="#1E88E5"
+        android:pathData="M20,40 Q20,30 30,30 L90,30 Q100,30 100,40 L100,80 Q100,90 90,90 L30,90 Q20,90 20,80 Z" />
+    <!-- Wallet Flap/Detail -->
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M85,50 L100,50 L100,70 L85,70 Q80,70 80,60 Q80,50 85,50 Z" />
+    <!-- AI Text on Wallet -->
+    <path
+        android:fillColor="#1E88E5"
+        android:pathData="M85,58 L88,58 L88,64 L85,64 Z" /> <!-- Simplified dot for AI detail -->
+    <!-- Connection lines/Circuitry at top left -->
+    <path
+        android:strokeColor="#1E88E5"
+        android:strokeWidth="2"
+        android:strokeLineCap="round"
+        android:pathData="M25,30 L20,20 M35,30 L30,15 M45,30 L45,18" />
+    <path
+        android:fillColor="#1E88E5"
+        android:pathData="M20,18 A2,2 0 1,1 20,22 A2,2 0 1,1 20,18 Z M30,13 A2,2 0 1,1 30,17 A2,2 0 1,1 30,13 Z M45,16 A2,2 0 1,1 45,20 A2,2 0 1,1 45,16 Z" />
+</vector>

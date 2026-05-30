@@ -3,326 +3,505 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="#F8F9FA">
+    android:background="@color/background">
 
-    <!-- Header -->
-    <TextView
-        android:id="@+id/tvHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hi, User!"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        android:textColor="#2D3748"
-        android:layout_marginTop="24dp"
-        android:layout_marginStart="24dp"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <TextView
-        android:id="@+id/tvSubHeader"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Financial Wellness Dashboard"
-        android:textSize="14sp"
-        android:textColor="#718096"
-        android:layout_marginStart="24dp"
-        app:layout_constraintTop_toBottomOf="@id/tvHeader"
-        app:layout_constraintStart_toStartOf="parent"/>
-
-    <com.google.android.material.imageview.ShapeableImageView
-        android:id="@+id/btnSettings"
-        android:layout_width="48dp"
-        android:layout_height="48dp"
-        android:layout_marginEnd="24dp"
-        android:scaleType="centerCrop"
-        android:src="@android:drawable/ic_menu_preferences"
-        android:padding="2dp"
-        app:strokeColor="#CBD5E0"
-        app:strokeWidth="1dp"
-        app:shapeAppearanceOverlay="@style/CircleAppearance"
-        app:layout_constraintTop_toTopOf="@id/tvHeader"
-        app:layout_constraintBottom_toBottomOf="@id/tvSubHeader"
-        app:layout_constraintEnd_toEndOf="parent" />
-
-    <!-- Main Summary Card -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardSummary"
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_margin="24dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="6dp"
-        app:cardBackgroundColor="#2D3748"
-        app:layout_constraintTop_toBottomOf="@id/tvSubHeader">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
         <LinearLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="24dp">
+            android:paddingBottom="80dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Remaining Balance"
-                android:textColor="#A0AEC0"
-                android:textSize="14sp"/>
-
-            <TextView
-                android:id="@+id/tvRemaining"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PKR 0.00"
-                android:textColor="#FFFFFF"
-                android:textSize="32sp"
-                android:textStyle="bold"/>
-
-            <View
+            <!-- Professional Header -->
+            <androidx.constraintlayout.widget.ConstraintLayout
                 android:layout_width="match_parent"
-                android:layout_height="1dp"
-                android:background="#4A5568"
-                android:layout_marginVertical="16dp"/>
+                android:layout_height="wrap_content"
+                android:paddingHorizontal="24dp"
+                android:paddingTop="32dp"
+                android:paddingBottom="16dp">
+
+                <LinearLayout
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toStartOf="@id/btnSettings">
+
+                    <TextView
+                        android:id="@+id/tvHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Hi, User!"
+                        android:textSize="28sp"
+                        android:fontFamily="sans-serif-black"
+                        android:textColor="@color/text_main" />
+
+                    <TextView
+                        android:id="@+id/tvSubHeader"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Track your savings and wellness"
+                        android:textSize="14sp"
+                        android:textColor="@color/text_secondary" />
+                </LinearLayout>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/btnSettings"
+                    android:layout_width="52dp"
+                    android:layout_height="52dp"
+                    android:scaleType="centerCrop"
+                    android:src="@android:drawable/ic_menu_preferences"
+                    android:padding="2dp"
+                    app:strokeColor="@color/slate_200"
+                    app:strokeWidth="2dp"
+                    app:shapeAppearanceOverlay="@style/CircleAppearance"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Premium Summary Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardSummary"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginVertical="12dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp">
+
+                <LinearLayout
+                    android:id="@+id/layoutReportContent"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_gradient"
+                    android:orientation="vertical"
+                    android:padding="28dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Current Balance"
+                        android:textColor="#E0E7FF"
+                        android:textSize="14sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"/>
+
+                    <TextView
+                        android:id="@+id/tvRemaining"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="PKR 0.00"
+                        android:textColor="@color/white"
+                        android:textSize="36sp"
+                        android:fontFamily="sans-serif-black"
+                        android:layout_marginTop="4dp"/>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="#4F46E5"
+                        android:layout_marginVertical="16dp"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="horizontal"
+                        android:baselineAligned="false"
+                        android:weightSum="3">
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Income"
+                                android:textColor="#A5B4FC"
+                                android:textSize="11sp"/>
+                            <TextView
+                                android:id="@+id/tvIncome"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="PKR 0"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Spent"
+                                android:textColor="#A5B4FC"
+                                android:textSize="11sp"/>
+                            <TextView
+                                android:id="@+id/tvExpenses"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="PKR 0"
+                                android:textColor="@color/white"
+                                android:textSize="16sp"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_weight="1"
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Goal"
+                                android:textColor="#A5B4FC"
+                                android:textSize="11sp"/>
+                            <TextView
+                                android:id="@+id/tvGoal"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="PKR 0"
+                                android:textColor="#6EE7B7"
+                                android:textSize="16sp"
+                                android:textStyle="bold"/>
+                        </LinearLayout>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
 
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal"
-                android:baselineAligned="false"
-                android:weightSum="2">
+                android:paddingHorizontal="24dp"
+                android:layout_marginTop="8dp"
+                android:gravity="center_vertical">
 
-                <LinearLayout
-                    android:layout_weight="1"
+                <TextView
+                    android:id="@+id/tvMonthComparison"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Monthly Income"
-                        android:textColor="#A0AEC0"
-                        android:textSize="12sp"/>
-                    <TextView
-                        android:id="@+id/tvIncome"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="PKR 0"
-                        android:textColor="#68D391"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
-                </LinearLayout>
+                    android:layout_weight="1"
+                    android:text="Spending 5% less than last month"
+                    android:textColor="@color/success"
+                    android:textSize="13sp"
+                    android:textStyle="bold"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnDownloadReport"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Download"
+                    app:icon="@android:drawable/ic_menu_save"
+                    android:textSize="12sp"
+                    android:textColor="@color/primary"/>
+            </LinearLayout>
+
+            <!-- AI Savings Analysis Section -->
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="20dp"
+                android:layout_marginBottom="12dp">
+
+                <TextView
+                    android:id="@+id/tvAnalysisTitle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Financial Analytics"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_main"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnStatement"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Mini Statement"
+                    android:textSize="12sp"
+                    app:icon="@android:drawable/ic_menu_agenda"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="parent"
+                    app:layout_constraintBottom_toBottomOf="parent"/>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <!-- Premium Goal Progress Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="4dp">
 
                 <LinearLayout
-                    android:layout_weight="1"
-                    android:layout_width="0dp"
+                    android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
-                    <TextView
-                        android:layout_width="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content">
+
+                        <TextView
+                            android:id="@+id/tvGoalTitle"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Savings Goal Progress"
+                            android:textColor="@color/text_main"
+                            android:textStyle="bold"
+                            android:textSize="14sp"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+
+                        <TextView
+                            android:id="@+id/tvGoalPercent"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="0%"
+                            android:textColor="@color/primary"
+                            android:textStyle="bold"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent" />
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.google.android.material.progressindicator.LinearProgressIndicator
+                        android:id="@+id/goalProgress"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="Total Expenses"
-                        android:textColor="#A0AEC0"
-                        android:textSize="12sp"/>
+                        android:layout_marginTop="12dp"
+                        app:indicatorColor="@color/success"
+                        app:trackColor="@color/slate_100"
+                        app:trackCornerRadius="8dp"
+                        app:trackThickness="10dp"
+                        android:progress="0" />
+
                     <TextView
-                        android:id="@+id/tvExpenses"
-                        android:layout_width="wrap_content"
+                        android:id="@+id/tvGoalRem"
+                        android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:text="PKR 0"
-                        android:textColor="#FC8181"
-                        android:textSize="16sp"
-                        android:textStyle="bold"/>
+                        android:text="PKR 0.00 to reach your goal"
+                        android:textColor="@color/text_secondary"
+                        android:textSize="12sp"
+                        android:layout_marginTop="8dp"
+                        android:gravity="end"/>
                 </LinearLayout>
-            </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Donut Chart Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Expense Distribution"
+                        android:textColor="@color/text_main"
+                        android:textSize="14sp"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="16dp"/>
+
+                    <com.github.mikephil.charting.charts.PieChart
+                        android:id="@+id/pieChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Weekly/Monthly Trends -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="16dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp">
+
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginBottom="16dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Spending Trends"
+                            android:textColor="@color/text_main"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"
+                            app:layout_constraintBottom_toBottomOf="parent"/>
+
+                        <com.google.android.material.chip.ChipGroup
+                            android:id="@+id/chipGroupReport"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            app:singleSelection="true"
+                            app:selectionRequired="true"
+                            app:layout_constraintEnd_toEndOf="parent">
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipWeekly"
+                                style="@style/Widget.MaterialComponents.Chip.Choice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Weekly"
+                                android:checked="true"/>
+                            <com.google.android.material.chip.Chip
+                                android:id="@+id/chipMonthly"
+                                style="@style/Widget.MaterialComponents.Chip.Choice"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Monthly"/>
+                        </com.google.android.material.chip.ChipGroup>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+
+                    <com.github.mikephil.charting.charts.BarChart
+                        android:id="@+id/reportBarChart"
+                        android:layout_width="match_parent"
+                        android:layout_height="250dp"/>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- AI Coach Insights -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardAIInsights"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="0dp"
+                app:cardBackgroundColor="@color/primary_light">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="horizontal"
+                    android:padding="20dp"
+                    android:gravity="center_vertical">
+
+                    <ImageView
+                        android:layout_width="40dp"
+                        android:layout_height="40dp"
+                        android:src="@android:drawable/ic_dialog_info"
+                        app:tint="@color/primary"/>
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:layout_marginStart="16dp">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AI Financial Coach"
+                            android:textColor="@color/primary"
+                            android:textStyle="bold"
+                            android:textSize="14sp"/>
+                        <TextView
+                            android:id="@+id/tvAICoachMessage"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:text="Your fuel spending is 15% higher than last week. Consider public transport to save more."
+                            android:textColor="@color/text_main"
+                            android:textSize="13sp"
+                            android:layout_marginTop="4dp"/>
+                    </LinearLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <!-- Budget Health Card -->
+            <androidx.cardview.widget.CardView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginBottom="24dp"
+                app:cardCornerRadius="20dp"
+                app:cardElevation="2dp">
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical"
+                    android:padding="20dp">
+
+                    <TextView
+                        android:id="@+id/tvBudgetProgressLabel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Monthly Budget Usage"
+                        android:textColor="@color/text_main"
+                        android:textStyle="bold"
+                        android:layout_marginBottom="12dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/pbBudgetUsage"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="12dp"
+                        android:progress="65"
+                        android:progressDrawable="@drawable/custom_progress_drawable"/>
+
+                    <androidx.constraintlayout.widget.ConstraintLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="12dp">
+
+                        <TextView
+                            android:id="@+id/tvBudgetHealth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Safe Spending"
+                            android:textColor="@color/success"
+                            android:textStyle="bold"
+                            app:layout_constraintStart_toStartOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
+
+                        <TextView
+                            android:id="@+id/tvDaysRemaining"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12 days left"
+                            android:textColor="@color/text_secondary"
+                            app:layout_constraintEnd_toEndOf="parent"
+                            app:layout_constraintTop_toTopOf="parent"/>
+                    </androidx.constraintlayout.widget.ConstraintLayout>
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
         </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Wellness Indicators -->
-    <LinearLayout
-        android:id="@+id/layoutIndicators"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:paddingHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        android:weightSum="2"
-        android:baselineAligned="false"
-        app:layout_constraintTop_toBottomOf="@id/cardSummary">
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginEnd="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Safe Daily Limit"
-                    android:textColor="#718096"
-                    android:textSize="11sp"/>
-                <TextView
-                    android:id="@+id/tvDailyLimit"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="PKR 0"
-                    android:textColor="#2D3748"
-                    android:textStyle="bold"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-
-        <androidx.cardview.widget.CardView
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:layout_marginStart="8dp"
-            app:cardCornerRadius="16dp"
-            app:cardElevation="2dp">
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="16dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Budget Health"
-                    android:textColor="#718096"
-                    android:textSize="11sp"/>
-                <TextView
-                    android:id="@+id/tvBudgetHealth"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Safe"
-                    android:textColor="#48BB78"
-                    android:textStyle="bold"
-                    android:textSize="14sp"/>
-            </LinearLayout>
-        </androidx.cardview.widget.CardView>
-    </LinearLayout>
-
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardBudgetProgress"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:layout_constraintTop_toBottomOf="@id/layoutIndicators">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-            <TextView
-                android:id="@+id/tvBudgetProgressLabel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Budget Used: 0%"
-                android:textColor="#4A5568"
-                android:textSize="12sp"
-                android:layout_marginBottom="8dp"/>
-            <ProgressBar
-                android:id="@+id/pbBudgetUsage"
-                style="?android:attr/progressBarStyleHorizontal"
-                android:layout_width="match_parent"
-                android:layout_height="8dp"
-                android:progress="0"
-                android:progressDrawable="@android:drawable/progress_horizontal"
-                android:progressTint="#ED8936"/>
-            <TextView
-                android:id="@+id/tvDaysRemaining"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="15 Days Remaining in Month"
-                android:textColor="#718096"
-                android:textSize="11sp"
-                android:gravity="end"
-                android:layout_marginTop="4dp"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- AI Coaching Message -->
-    <androidx.cardview.widget.CardView
-        android:id="@+id/cardAIInsights"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginHorizontal="24dp"
-        android:layout_marginTop="16dp"
-        android:layout_marginBottom="100dp"
-        app:cardCornerRadius="16dp"
-        app:cardElevation="2dp"
-        app:cardBackgroundColor="#EBF8FF"
-        app:layout_constraintTop_toBottomOf="@id/cardBudgetProgress"
-        app:layout_constraintBottom_toBottomOf="parent">
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="vertical"
-            android:padding="16dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="AI Financial Wellness Insight"
-                android:textColor="#2B6CB0"
-                android:textStyle="bold"
-                android:textSize="14sp"/>
-            <TextView
-                android:id="@+id/tvAICoachMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:text="Analyzing your spending speed... Your budget looks healthy!"
-                android:textColor="#2D3748"
-                android:textSize="13sp"
-                android:layout_marginTop="4dp"/>
-        </LinearLayout>
-    </androidx.cardview.widget.CardView>
-
-    <!-- Quick Actions -->
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="horizontal"
-        android:padding="24dp"
-        android:baselineAligned="false"
-        app:layout_constraintBottom_toBottomOf="parent">
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnVoice"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Voice"
-            app:icon="@android:drawable/ic_btn_speak_now"
-            android:layout_marginEnd="8dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnScan"
-            style="@style/Widget.MaterialComponents.Button.TextButton"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1"
-            android:text="Scan"
-            app:icon="@android:drawable/ic_menu_camera"
-            android:layout_marginEnd="8dp"/>
-
-        <com.google.android.material.button.MaterialButton
-            android:id="@+id/btnAddManual"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="1.2"
-            android:text="Add Manual"
-            app:cornerRadius="12dp"
-            android:backgroundTint="#ED8936"/>
-    </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
-

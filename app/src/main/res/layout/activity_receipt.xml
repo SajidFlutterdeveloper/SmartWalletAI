@@ -1,0 +1,198 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@color/slate_50">
+
+    <androidx.core.widget.NestedScrollView
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/btnShareReceipt">
+
+        <LinearLayout
+            android:id="@+id/layoutReceipt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:padding="24dp"
+            android:layout_margin="16dp"
+            android:background="@color/white"
+            android:elevation="4dp">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="SMART WALLET AI"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:textColor="@color/primary"
+                android:layout_gravity="center_horizontal"
+                android:letterSpacing="0.1"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Official Digital Receipt"
+                android:textSize="10sp"
+                android:textColor="@color/text_secondary"
+                android:layout_gravity="center_horizontal"
+                android:textAllCaps="true"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/slate_200"
+                android:layout_marginVertical="16dp"
+                android:backgroundTint="@color/slate_200"/>
+
+            <TextView
+                android:id="@+id/tvReceiptId"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="TRANS ID: SW-AI-12345678"
+                android:textSize="11sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_main"
+                android:gravity="center"
+                android:fontFamily="monospace"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/slate_100"
+                android:layout_marginVertical="12dp"/>
+
+            <GridLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:columnCount="2">
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Date:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"/>
+                <TextView
+                    android:id="@+id/tvReceiptDate"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="2023-10-27 14:30"
+                    android:textColor="@color/text_main"
+                    android:textSize="12sp"
+                    android:layout_marginStart="8dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Category:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+                <TextView
+                    android:id="@+id/tvReceiptCategory"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Groceries"
+                    android:textColor="@color/text_main"
+                    android:textSize="12sp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="bold"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Method:"
+                    android:textColor="@color/text_secondary"
+                    android:textSize="12sp"
+                    android:layout_marginTop="4dp"/>
+                <TextView
+                    android:id="@+id/tvReceiptMethod"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Voice Scan"
+                    android:textColor="@color/text_main"
+                    android:textSize="12sp"
+                    android:layout_marginStart="8dp"
+                    android:layout_marginTop="4dp"
+                    android:textStyle="bold"/>
+            </GridLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/slate_200"
+                android:layout_marginVertical="16dp"/>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="DESCRIPTION"
+                android:textSize="10sp"
+                android:textStyle="bold"
+                android:textColor="@color/text_secondary"/>
+
+            <TextView
+                android:id="@+id/tvReceiptNote"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Weekly Grocery Shopping from Metro Cash &amp; Carry"
+                android:textColor="@color/text_main"
+                android:textSize="14sp"
+                android:layout_marginTop="4dp"/>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="2dp"
+                android:background="@color/slate_100"
+                android:layout_marginVertical="16dp"/>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+                <TextView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:text="TOTAL AMOUNT"
+                    android:textSize="14sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_main"/>
+                <TextView
+                    android:id="@+id/tvReceiptAmount"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="PKR 2,500.00"
+                    android:textSize="18sp"
+                    android:textStyle="bold"
+                    android:textColor="@color/primary"/>
+            </LinearLayout>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="*** End of Receipt ***"
+                android:gravity="center"
+                android:layout_marginTop="32dp"
+                android:textColor="@color/text_secondary"
+                android:textSize="10sp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <com.google.android.material.button.MaterialButton
+        android:id="@+id/btnShareReceipt"
+        android:layout_width="match_parent"
+        android:layout_height="60dp"
+        android:text="Share Receipt"
+        android:layout_margin="16dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:cornerRadius="12dp"
+        app:icon="@android:drawable/ic_menu_share"/>
+
+</androidx.constraintlayout.widget.ConstraintLayout>
