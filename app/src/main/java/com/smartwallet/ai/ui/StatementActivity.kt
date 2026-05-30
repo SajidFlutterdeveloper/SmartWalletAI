@@ -1,9 +1,8 @@
 package com.smartwallet.ai.ui
 
-import android.graphics.Bitmap
 import android.graphics.Canvas
+import android.graphics.pdf.PdfDocument
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import android.widget.Toast
@@ -67,9 +66,14 @@ class StatementActivity : AppCompatActivity() {
 
     private fun captureAndShare() {
         try {
-            val bitmap = Bitmap.createBitmap(binding.layoutStatement.width, binding.layoutStatement.height, Bitmap.Config.ARGB_8888)
-            val canvas = Canvas(bitmap)
-            binding.layoutStatement.draw(canvas)
+            val view = binding.layoutStatement
+            val pdfDocument = PdfDocument()
+            val pageInfo = PdfDocument.PageInfo.Builder(view.width, view.height, 1).create()
+            val page = pdfDocument.startPage(pageInfo)
+            val canvas = page.canvas
+
+            // Draw content
+            view.draw(canvas)
 
             // Add Verified Stamp
             val paint = android.graphics.Paint().apply {
@@ -84,8 +88,8 @@ class StatementActivity : AppCompatActivity() {
             }
 
             canvas.save()
-            val centerX = bitmap.width / 2f
-            val centerY = bitmap.height / 2f
+            val centerX = view.width / 2f
+            val centerY = view.height / 2f
             canvas.rotate(-45f, centerX, centerY)
             
             val stampText = "VERIFIED BY SMART WALLET AI"
@@ -102,19 +106,22 @@ class StatementActivity : AppCompatActivity() {
             canvas.drawText(stampText, centerX, centerY + 10, paint)
             canvas.restore()
 
-            val file = File(getExternalFilesDir(Environment.DIRECTORY_PICTURES), "SmartWallet_Statement_${System.currentTimeMillis()}.png")
+            pdfDocument.finishPage(page)
+
+            val file = File(getExternalFilesDir(null), "SmartWallet_Statement_${System.currentTimeMillis()}.pdf")
             val out = FileOutputStream(file)
-            bitmap.compress(Bitmap.CompressFormat.PNG, 100, out)
+            pdfDocument.writeTo(out)
+            pdfDocument.close()
             out.flush()
             out.close()
 
             val uri = FileProvider.getUriForFile(this, "$packageName.provider", file)
             val intent = android.content.Intent(android.content.Intent.ACTION_SEND).apply {
-                type = "image/png"
+                type = "application/pdf"
                 putExtra(android.content.Intent.EXTRA_STREAM, uri)
                 addFlags(android.content.Intent.FLAG_GRANT_READ_URI_PERMISSION)
             }
-            startActivity(android.content.Intent.createChooser(intent, "Share Mini Statement"))
+            startActivity(android.content.Intent.createChooser(intent, "Share Mini Statement (PDF)"))
         } catch (e: Exception) {
             Toast.makeText(this, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
         }
