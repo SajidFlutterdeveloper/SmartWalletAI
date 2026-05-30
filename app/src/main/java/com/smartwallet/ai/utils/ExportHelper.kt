@@ -10,31 +10,35 @@ import java.util.*
 
 object ExportHelper {
 
-    fun exportToCSV(context: Context, expenses: List<Expense>): File? {
-        val fileName = "Expenses_${SimpleDateFormat("yyyyMMdd_HHmm", Locale.getDefault()).format(Date())}.csv"
-        val file = File(context.cacheDir, fileName)
+    fun exportExpensesToCSV(context: Context, expenses: List<Expense>) {
+        val fileName = "SmartWallet_Export_${System.currentTimeMillis()}.csv"
+        val file = File(context.getExternalFilesDir(null), fileName)
         
-        return try {
-            file.printWriter().use { out ->
-                out.println("Date,Category,Amount,Shop,Method,Note")
+        try {
+            file.writer().use { out ->
+                out.write("ID,Date,Category,Shop,Note,Amount,InputMethod\n")
                 val sdf = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault())
-                expenses.forEach {
-                    out.println("${sdf.format(Date(it.date))},${it.category},${it.amount},${it.shopName ?: ""},${it.inputMethod},${it.note}")
+                
+                expenses.forEach { exp ->
+                    val line = "${exp.id},${sdf.format(Date(exp.date))},\"${exp.category}\",\"${exp.shopName ?: ""}\",\"${exp.note}\",${exp.amount},${exp.inputMethod}\n"
+                    out.write(line)
                 }
             }
-            file
+            
+            shareFile(context, file, "text/csv", "Export Transactions (CSV)")
+            
         } catch (e: Exception) {
-            null
+            e.printStackTrace()
         }
     }
 
-    fun shareFile(context: Context, file: File) {
+    private fun shareFile(context: Context, file: File, mimeType: String, title: String) {
         val uri = FileProvider.getUriForFile(context, "${context.packageName}.provider", file)
         val intent = Intent(Intent.ACTION_SEND).apply {
-            type = "text/csv"
+            type = mimeType
             putExtra(Intent.EXTRA_STREAM, uri)
             addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION)
         }
-        context.startActivity(Intent.createChooser(intent, "Export Expenses"))
+        context.startActivity(Intent.createChooser(intent, title))
     }
 }

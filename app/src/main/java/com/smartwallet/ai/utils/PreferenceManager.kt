@@ -38,4 +38,8 @@ class PreferenceManager(context: Context) {
         prefs.edit().putString("profile_pic_url", url).apply()
     }
     fun getProfilePicUrl(): String? = prefs.getString("profile_pic_url", null)
+
+    fun clearData() {
+        prefs.edit().clear().apply()
+    }
 }

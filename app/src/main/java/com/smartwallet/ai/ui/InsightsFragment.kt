@@ -91,7 +91,9 @@ class InsightsFragment : Fragment() {
         // Budget Usage
         binding.pbBudgetUsage.progress = data.budgetUtilization
         binding.tvBudgetText.text = "${data.budgetUtilization}%"
-        binding.tvDailyLimit.text = String.format(Locale.getDefault(), "Daily safe spending limit: PKR %.0f", data.dailySafeLimit)
+        binding.tvDailyLimit.text = data.dailySafeMessage.ifEmpty { 
+            String.format(Locale.getDefault(), "Daily safe spending limit: PKR %.0f", data.dailySafeLimit) 
+        }
         
         // Survival Prediction
         binding.tvSurvivalProb.text = "${data.survivalPrediction.probability}% Probability"

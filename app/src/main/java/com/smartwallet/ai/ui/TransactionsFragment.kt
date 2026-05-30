@@ -11,6 +11,7 @@ import android.widget.Toast
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.recyclerview.widget.LinearLayoutManager
+import com.smartwallet.ai.R
 import com.smartwallet.ai.data.model.Expense
 import com.smartwallet.ai.databinding.FragmentTransactionsBinding
 import com.smartwallet.ai.ui.adapter.TransactionAdapter
@@ -92,18 +93,21 @@ class TransactionsFragment : Fragment() {
             },
             onDelete = { expense ->
                 MaterialAlertDialogBuilder(requireContext())
-                    .setTitle("Delete Transaction")
-                    .setMessage("Are you sure you want to delete this transaction?")
+                    .setTitle("Erase Transaction")
+                    .setMessage("Are you sure you want to erase this data from your universe?")
                     .setNegativeButton("Cancel", null)
-                    .setPositiveButton("Delete") { _, _ ->
+                    .setPositiveButton("Erase") { _, _ ->
                         viewModel.deleteExpense(expense)
-                        Toast.makeText(requireContext(), "Transaction deleted", Toast.LENGTH_SHORT).show()
+                        Toast.makeText(requireContext(), "History updated", Toast.LENGTH_SHORT).show()
                     }
                     .show()
             }
         )
-        binding.rvTransactions.layoutManager = LinearLayoutManager(requireContext())
-        binding.rvTransactions.adapter = adapter
+        binding.rvTransactions.apply {
+            layoutManager = LinearLayoutManager(requireContext())
+            adapter = this@TransactionsFragment.adapter
+            layoutAnimation = android.view.animation.AnimationUtils.loadLayoutAnimation(context, R.anim.layout_animation_fall_down)
+        }
     }
 
     private fun setupObservers() {

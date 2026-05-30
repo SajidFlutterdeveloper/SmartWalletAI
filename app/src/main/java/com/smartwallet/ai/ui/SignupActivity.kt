@@ -2,6 +2,7 @@ package com.smartwallet.ai.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import com.google.firebase.auth.FirebaseAuth
@@ -17,6 +18,8 @@ class SignupActivity : AppCompatActivity() {
         binding = ActivitySignupBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        animateUI()
+
         binding.btnSignup.setOnClickListener {
             val email = binding.etEmail.text.toString()
             val pass = binding.etPassword.text.toString()
@@ -24,12 +27,14 @@ class SignupActivity : AppCompatActivity() {
 
             if (email.isNotEmpty() && pass.isNotEmpty() && confirmPass.isNotEmpty()) {
                 if (pass == confirmPass) {
+                    binding.btnSignup.isEnabled = false
                     auth.createUserWithEmailAndPassword(email, pass).addOnCompleteListener {
                         if (it.isSuccessful) {
-                            Toast.makeText(this, "Account Created!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(this, "Universe Registered Successfully!", Toast.LENGTH_SHORT).show()
                             startActivity(Intent(this, ProfileActivity::class.java))
                             finish()
                         } else {
+                            binding.btnSignup.isEnabled = true
                             Toast.makeText(this, "Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
                         }
                     }
@@ -44,5 +49,14 @@ class SignupActivity : AppCompatActivity() {
         binding.tvGoToLogin.setOnClickListener {
             finish()
         }
+    }
+
+    private fun animateUI() {
+        binding.topGradient.translationY = -300f
+        binding.topGradient.animate().translationY(0f).setDuration(600).setInterpolator(DecelerateInterpolator()).start()
+
+        binding.cardSignup.alpha = 0f
+        binding.cardSignup.translationY = 200f
+        binding.cardSignup.animate().alpha(1f).translationY(0f).setStartDelay(400).setDuration(800).start()
     }
 }

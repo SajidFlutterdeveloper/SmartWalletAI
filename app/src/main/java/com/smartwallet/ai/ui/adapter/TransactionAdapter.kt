@@ -31,11 +31,26 @@ class TransactionAdapter(
 
         fun bind(expense: Expense) {
             binding.tvCategory.text = expense.category
-            binding.tvAmount.text = "PKR ${String.format("%.2f", expense.amount)}"
+            binding.tvAmount.text = "PKR ${String.format("%.0f", expense.amount)}"
+            
+            val context = binding.root.context
+            
+            // Category specific styling
+            val color = when(expense.category) {
+                "Food" -> "#F59E0B"
+                "Fuel" -> "#EF4444"
+                "Salary" -> "#10B981"
+                "Shopping" -> "#EC4899"
+                "Bills" -> "#3B82F6"
+                else -> "#6366F1"
+            }
+            
+            binding.viewCategoryBg.backgroundTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(color))
+            binding.ivCategoryIcon.imageTintList = android.content.res.ColorStateList.valueOf(android.graphics.Color.parseColor(color))
             
             val sdf = SimpleDateFormat("dd MMM yyyy • hh:mm a", Locale.getDefault())
             binding.tvDate.text = sdf.format(Date(expense.date))
-            binding.tvMethod.text = "Entry: ${expense.inputMethod}"
+            binding.tvMethod.text = "AI ${expense.inputMethod} Entry"
             
             binding.btnOptions.setOnClickListener { view ->
                 val popup = PopupMenu(view.context, view)

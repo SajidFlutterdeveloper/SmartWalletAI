@@ -2,6 +2,8 @@ package com.smartwallet.ai.ui
 
 import android.content.Intent
 import android.os.Bundle
+import android.view.View
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.appcompat.app.AppCompatActivity
@@ -23,32 +25,14 @@ class LoginActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
-        if (auth.currentUser != null) {
-            startActivity(Intent(this, MainActivity::class.java))
-            finish()
-        }
-
         binding = ActivityLoginBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        animateUI()
         setupGoogleSignIn()
 
         binding.btnLogin.setOnClickListener {
-            val email = binding.etEmail.text.toString()
-            val pass = binding.etPassword.text.toString()
-
-            if (email.isNotEmpty() && pass.isNotEmpty()) {
-                auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
-                    if (it.isSuccessful) {
-                        startActivity(Intent(this, MainActivity::class.java))
-                        finish()
-                    } else {
-                        Toast.makeText(this, "Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
-                    }
-                }
-            } else {
-                Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
-            }
+            loginUser()
         }
 
         binding.btnGoogleLogin.setOnClickListener {
@@ -57,6 +41,46 @@ class LoginActivity : AppCompatActivity() {
 
         binding.tvGoToSignup.setOnClickListener {
             startActivity(Intent(this, SignupActivity::class.java))
+        }
+
+        binding.tvForgotPassword.setOnClickListener {
+            val email = binding.etEmail.text.toString()
+            if (email.isNotEmpty()) {
+                auth.sendPasswordResetEmail(email).addOnCompleteListener {
+                    Toast.makeText(this, "Reset link sent to your email", Toast.LENGTH_LONG).show()
+                }
+            } else {
+                Toast.makeText(this, "Enter email to reset password", Toast.LENGTH_SHORT).show()
+            }
+        }
+    }
+
+    private fun animateUI() {
+        binding.topGradient.translationY = -300f
+        binding.topGradient.animate().translationY(0f).setDuration(600).setInterpolator(DecelerateInterpolator()).start()
+
+        binding.cardLogin.alpha = 0f
+        binding.cardLogin.translationY = 200f
+        binding.cardLogin.animate().alpha(1f).translationY(0f).setStartDelay(400).setDuration(800).start()
+    }
+
+    private fun loginUser() {
+        val email = binding.etEmail.text.toString()
+        val pass = binding.etPassword.text.toString()
+
+        if (email.isNotEmpty() && pass.isNotEmpty()) {
+            binding.btnLogin.isEnabled = false
+            auth.signInWithEmailAndPassword(email, pass).addOnCompleteListener {
+                if (it.isSuccessful) {
+                    startActivity(Intent(this, MainActivity::class.java))
+                    finish()
+                } else {
+                    binding.btnLogin.isEnabled = true
+                    Toast.makeText(this, "Error: ${it.exception?.message}", Toast.LENGTH_SHORT).show()
+                }
+            }
+        } else {
+            Toast.makeText(this, "Please fill all fields", Toast.LENGTH_SHORT).show()
         }
     }
 

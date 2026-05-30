@@ -1,27 +1,36 @@
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
-    android:width="120dp"
-    android:height="120dp"
-    android:viewportWidth="120"
-    android:viewportHeight="120">
-    <!-- Main Wallet Body -->
-    <path
-        android:fillColor="#1E88E5"
-        android:pathData="M20,40 Q20,30 30,30 L90,30 Q100,30 100,40 L100,80 Q100,90 90,90 L30,90 Q20,90 20,80 Z" />
-    <!-- Wallet Flap/Detail -->
-    <path
-        android:fillColor="#FFFFFF"
-        android:pathData="M85,50 L100,50 L100,70 L85,70 Q80,70 80,60 Q80,50 85,50 Z" />
-    <!-- AI Text on Wallet -->
-    <path
-        android:fillColor="#1E88E5"
-        android:pathData="M85,58 L88,58 L88,64 L85,64 Z" /> <!-- Simplified dot for AI detail -->
-    <!-- Connection lines/Circuitry at top left -->
-    <path
-        android:strokeColor="#1E88E5"
-        android:strokeWidth="2"
-        android:strokeLineCap="round"
-        android:pathData="M25,30 L20,20 M35,30 L30,15 M45,30 L45,18" />
-    <path
-        android:fillColor="#1E88E5"
-        android:pathData="M20,18 A2,2 0 1,1 20,22 A2,2 0 1,1 20,18 Z M30,13 A2,2 0 1,1 30,17 A2,2 0 1,1 30,13 Z M45,16 A2,2 0 1,1 45,20 A2,2 0 1,1 45,16 Z" />
+    xmlns:aapt="http://schemas.android.com/aapt"
+    android:width="200dp"
+    android:height="200dp"
+    android:viewportWidth="200"
+    android:viewportHeight="200">
+  <path
+      android:pathData="M100,100m-90,0a90,90 0,1 1,180 0a90,90 0,1 1,-180 0">
+    <aapt:attr name="android:fillColor">
+      <gradient
+          android:startY="10"
+          android:startX="100"
+          android:endY="190"
+          android:endX="100"
+          android:type="linear">
+        <item android:offset="0" android:color="#FF6366F1"/>
+        <item android:offset="1" android:color="#FF4338CA"/>
+      </gradient>
+    </aapt:attr>
+  </path>
+  <path
+      android:pathData="M60,80L140,80Q150,80 150,90L150,130Q150,140 140,140L60,140Q50,140 50,130L50,90Q50,80 60,80Z"
+      android:fillColor="#FFFFFF"/>
+  <path
+      android:pathData="M125,95L150,95L150,125L125,125Q115,125 115,110Q115,95 125,95Z"
+      android:fillColor="#E0E7FF"/>
+  <path
+      android:pathData="M130,105A5,5 0,1 1,130,115A5,5 0,1 1,130,105"
+      android:fillColor="#4338CA"/>
+  <path
+      android:pathData="M70,60L100,40L130,60"
+      android:strokeColor="#FFFFFF"
+      android:strokeWidth="6"
+      android:strokeLineCap="round"
+      android:strokeLineJoin="round"/>
 </vector>

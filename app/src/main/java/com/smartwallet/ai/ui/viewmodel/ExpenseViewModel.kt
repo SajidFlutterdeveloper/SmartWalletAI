@@ -22,6 +22,7 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     val totalExpenses: LiveData<Double?>
     val aiInsights = MutableLiveData<List<String>>()
     val advancedInsights = MutableLiveData<com.smartwallet.ai.data.model.AIInsightData>()
+    val spendingForecast = MutableLiveData<Double>()
     private val userId: String = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     private val preferenceManager = PreferenceManager(application)
 
@@ -82,5 +83,15 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         val currentExpenses = allExpenses.value ?: emptyList()
         aiInsights.value = com.smartwallet.ai.utils.AIInsightEngine.generateInsights(currentExpenses, monthlyIncome, savingsGoal)
         advancedInsights.value = com.smartwallet.ai.utils.AIInsightEngine.generateAdvancedInsights(currentExpenses, monthlyIncome, savingsGoal)
+        
+        // Calculate Forecasting
+        val spent = currentExpenses.sumOf { it.amount }
+        val dayOfMonth = java.util.Calendar.getInstance().get(java.util.Calendar.DAY_OF_MONTH)
+        val daysInMonth = java.util.Calendar.getInstance().getActualMaximum(java.util.Calendar.DAY_OF_MONTH)
+        
+        if (dayOfMonth > 0) {
+            val dailyAverage = spent / dayOfMonth
+            spendingForecast.value = dailyAverage * daysInMonth
+        }
     }
 }

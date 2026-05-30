@@ -17,6 +17,7 @@ import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import com.bumptech.glide.Glide
+import com.smartwallet.ai.R
 import com.google.firebase.auth.FirebaseAuth
 import com.smartwallet.ai.data.model.AIInsightData
 import com.smartwallet.ai.databinding.FragmentProfileBinding
@@ -32,7 +33,6 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var preferenceManager: PreferenceManager
     private val viewModel: ExpenseViewModel by viewModels()
-    private val auth by lazy { FirebaseAuth.getInstance() }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -98,10 +98,14 @@ class ProfileFragment : Fragment() {
             saveData()
         }
 
-        binding.btnLogout.setOnClickListener {
-            auth.signOut()
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
-            requireActivity().finishAffinity()
+        binding.btnExportData.setOnClickListener {
+            val expenses = viewModel.allExpenses.value ?: emptyList()
+            com.smartwallet.ai.utils.ExportHelper.exportExpensesToCSV(requireContext(), expenses)
+        }
+
+        binding.btnPrivacy.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://smartwallet.ai/privacy"))
+            startActivity(browserIntent)
         }
     }
 
@@ -157,7 +161,13 @@ class ProfileFragment : Fragment() {
                 val directory = File(requireContext().filesDir, "profile_pics")
                 if (!directory.exists()) directory.mkdirs()
 
-                val file = File(directory, "profile_picture.jpg")
+                // Delete old profile pictures to save space
+                directory.listFiles()?.forEach { it.delete() }
+
+                // Create a unique filename to bypass Glide's cache
+                val fileName = "profile_${System.currentTimeMillis()}.jpg"
+                val file = File(directory, fileName)
+
                 FileOutputStream(file).use { output ->
                     input.copyTo(output)
                 }
@@ -178,7 +188,6 @@ class ProfileFragment : Fragment() {
         
         if (name.isNotEmpty() && income > 0) {
             preferenceManager.saveProfile(name, "", income, goal, 1, "PKR")
-            preferenceManager.setBiometricEnabled(binding.switchBiometric.isChecked)
             binding.tvDisplayUserName.text = name
             Toast.makeText(requireContext(), "Profile Synchronized!", Toast.LENGTH_SHORT).show()
         }

@@ -1,16 +1,13 @@
 package com.smartwallet.ai.ui
 
-import android.graphics.Bitmap
-import android.graphics.Canvas
 import android.net.Uri
+import android.os.Build
 import android.os.Bundle
-import android.os.Environment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.view.animation.AnimationUtils
 import android.widget.Toast
-import androidx.core.content.FileProvider
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
 import androidx.navigation.fragment.findNavController
@@ -25,7 +22,6 @@ import com.github.mikephil.charting.data.*
 import com.github.mikephil.charting.formatter.IndexAxisValueFormatter
 import com.github.mikephil.charting.formatter.PercentFormatter
 import java.io.File
-import java.io.FileOutputStream
 import java.text.SimpleDateFormat
 import java.util.*
 
@@ -49,16 +45,30 @@ class DashboardFragment : Fragment() {
         super.onViewCreated(view, savedInstanceState)
 
         preferenceManager = PreferenceManager(requireContext())
+        checkNotificationPermission()
         setupCharts()
         setupListeners()
         setupObservers()
         applyAnimations()
     }
 
+    private fun checkNotificationPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
+            val permission = android.Manifest.permission.POST_NOTIFICATIONS
+            if (androidx.core.content.ContextCompat.checkSelfPermission(requireContext(), permission) != android.content.pm.PackageManager.PERMISSION_GRANTED) {
+                requestPermissions(arrayOf(permission), 101)
+            }
+        }
+    }
+
     private fun applyAnimations() {
         val fadeIn = AnimationUtils.loadAnimation(requireContext(), android.R.anim.fade_in)
         binding.cardSummary.startAnimation(fadeIn)
         binding.cardAIInsights.startAnimation(fadeIn)
+        
+        // Add subtle slide up to other components
+        val slideUp = AnimationUtils.loadAnimation(requireContext(), R.anim.slide_up)
+        binding.pieChart.startAnimation(slideUp)
     }
 
     override fun onResume() {
@@ -67,19 +77,17 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupListeners() {
-        binding.btnSettings.setOnClickListener {
-            findNavController().navigate(R.id.navigation_profile)
-        }
-
         binding.chipGroupReport.setOnCheckedChangeListener { _, _ ->
             viewModel.allExpenses.value?.let { updateReportChart(it) }
         }
 
         binding.btnDownloadReport.setOnClickListener {
-            generateStatement("This Month")
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            exportCSV("This Month")
         }
 
         binding.btnStatement.setOnClickListener {
+            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             showStatementFilter()
         }
     }
@@ -90,25 +98,38 @@ class DashboardFragment : Fragment() {
         dialog.setContentView(dialogView)
 
         val btnGenerate = dialogView.findViewById<com.google.android.material.button.MaterialButton>(R.id.btnGenerate)
-        val chipGroup = dialogView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupPeriod)
+        val chipGroupPeriod = dialogView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupPeriod)
+        val chipGroupFormat = dialogView.findViewById<com.google.android.material.chip.ChipGroup>(R.id.chipGroupFormat)
 
         btnGenerate.setOnClickListener {
-            val period = when (chipGroup.checkedChipId) {
+            val period = when (chipGroupPeriod.checkedChipId) {
                 R.id.chipThisWeek -> "This Week"
                 R.id.chipThisMonth -> "This Month"
                 R.id.chipThisYear -> "This Year"
                 else -> "This Month"
             }
-            generateStatement(period)
+            
+            val isCSV = chipGroupFormat.checkedChipId == R.id.chipCSV
+            
+            if (isCSV) {
+                exportCSV(period)
+            } else {
+                generateStatement(period)
+            }
             dialog.dismiss()
         }
         dialog.show()
     }
 
-    private fun generateStatement(period: String) {
+    private fun exportCSV(period: String) {
         val allExpenses = viewModel.allExpenses.value ?: emptyList()
+        val filtered = filterByPeriod(allExpenses, period)
+        com.smartwallet.ai.utils.ExportHelper.exportExpensesToCSV(requireContext(), filtered)
+    }
+
+    private fun filterByPeriod(allExpenses: List<com.smartwallet.ai.data.model.Expense>, period: String): List<com.smartwallet.ai.data.model.Expense> {
         val cal = Calendar.getInstance()
-        val filtered = when (period) {
+        return when (period) {
             "This Week" -> {
                 cal.set(Calendar.DAY_OF_WEEK, cal.firstDayOfWeek)
                 allExpenses.filter { it.date >= cal.timeInMillis }
@@ -123,6 +144,11 @@ class DashboardFragment : Fragment() {
             }
             else -> allExpenses
         }
+    }
+
+    private fun generateStatement(period: String) {
+        val allExpenses = viewModel.allExpenses.value ?: emptyList()
+        val filtered = filterByPeriod(allExpenses, period)
 
         val intent = android.content.Intent(requireContext(), StatementActivity::class.java)
         intent.putExtra("PERIOD", period)
@@ -136,22 +162,21 @@ class DashboardFragment : Fragment() {
         val currency = preferenceManager.getCurrency()
         binding.tvIncome.text = "$currency ${String.format(Locale.getDefault(), "%.0f", income)}"
 
-        // Load Profile Picture
+        // Professional Branding: Use new Logo as high-quality default
+        binding.ivProfileIcon.setImageResource(R.drawable.ic_app_logo)
+        
+        // Load User Profile Picture if available
         val profileUrl = preferenceManager.getProfilePicUrl()
         if (!profileUrl.isNullOrEmpty()) {
             val imgFile = File(profileUrl)
             if (imgFile.exists()) {
                 Glide.with(this)
                     .load(imgFile)
-                    .placeholder(R.drawable.ic_wallet_ai_logo)
-                    .error(R.drawable.ic_wallet_ai_logo)
+                    .placeholder(R.drawable.ic_app_logo)
+                    .error(R.drawable.ic_app_logo)
                     .circleCrop()
-                    .into(binding.btnSettings)
-            } else {
-                binding.btnSettings.setImageResource(R.drawable.ic_wallet_ai_logo)
+                    .into(binding.ivProfileIcon)
             }
-        } else {
-            binding.btnSettings.setImageResource(R.drawable.ic_wallet_ai_logo)
         }
     }
 
@@ -166,32 +191,23 @@ class DashboardFragment : Fragment() {
             val spent = total ?: 0.0
             val remaining = income - spent
 
-            binding.tvExpenses.text = "$currency ${String.format(Locale.getDefault(), "%.0f", spent)}"
             binding.tvRemaining.text = "$currency ${String.format(Locale.getDefault(), "%.0f", remaining)}"
+            binding.tvIncome.text = "$currency ${String.format(Locale.getDefault(), "%.0f", income)}"
+            binding.tvExpenses.text = "$currency ${String.format(Locale.getDefault(), "%.0f", spent)}"
 
             val usagePercent = BudgetCalculator.getBudgetUsagePercentage(income, spent)
             val health = BudgetCalculator.getSpendingHealth(income, goal, spent)
             val remainingDays = BudgetCalculator.getRemainingDaysInMonth()
 
-            binding.tvBudgetHealth.text = health
-            binding.pbBudgetUsage.progress = usagePercent.coerceIn(0, 100)
-            binding.tvDaysRemaining.text = "$remainingDays Days Remaining"
+            updateBudgetHealthUI(health, usagePercent, remainingDays)
 
-            // Professional Goal Progress Logic
             val currentSavings = income - spent
             val progress = if (goal > 0) (currentSavings / goal * 100).toInt() else 0
             
-            binding.goalProgress.progress = progress.coerceIn(0, 100)
+            binding.goalProgress.setProgressCompat(progress.coerceIn(0, 100), true)
             binding.tvGoalPercent.text = "$progress%"
             val remToGoal = (goal - currentSavings).coerceAtLeast(0.0)
             binding.tvGoalRem.text = "$currency ${String.format(Locale.getDefault(), "%.0f", remToGoal)} to reach your goal"
-
-            // Color coding health
-            when (health) {
-                "Safe Spending" -> binding.tvBudgetHealth.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.success))
-                "Risky Spending", "Moderate Spending" -> binding.tvBudgetHealth.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.warning))
-                else -> binding.tvBudgetHealth.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
-            }
 
             viewModel.calculateInsights(income, goal)
         }
@@ -208,6 +224,11 @@ class DashboardFragment : Fragment() {
             if (insights.isNotEmpty()) {
                 binding.tvAICoachMessage.text = insights[0]
             }
+        }
+
+        viewModel.spendingForecast.observe(viewLifecycleOwner) { forecast ->
+            val currency = preferenceManager.getCurrency()
+            binding.tvForecast.text = "$currency ${String.format(Locale.getDefault(), "%.0f", forecast)}"
         }
     }
 
@@ -237,33 +258,57 @@ class DashboardFragment : Fragment() {
             if (diff > 0) {
                 binding.tvMonthComparison.text = "Spending ${String.format(locale, "%.0f", percent)}% more than last month"
                 binding.tvMonthComparison.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
+                binding.tvMonthComparison.alpha = 1.0f
             } else {
                 binding.tvMonthComparison.text = "Saved ${String.format(locale, "%.0f", percent)}% more than last month!"
                 binding.tvMonthComparison.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.success))
+                binding.tvMonthComparison.alpha = 1.0f
             }
         } else {
-            binding.tvMonthComparison.text = "Tracking your first month of savings"
-            binding.tvMonthComparison.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary))
+            binding.tvMonthComparison.text = "Tracking your first month of saving"
+            binding.tvMonthComparison.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.white))
+            binding.tvMonthComparison.alpha = 1.0f
         }
     }
 
     private fun setupCharts() {
-        // Donut Chart
         binding.pieChart.apply {
             description.isEnabled = false
+            setUsePercentValues(true)
+            dragDecelerationFrictionCoef = 0.95f
             isDrawHoleEnabled = true
             setHoleColor(android.graphics.Color.TRANSPARENT)
-            holeRadius = 70f
+            setTransparentCircleColor(android.graphics.Color.WHITE)
+            setTransparentCircleAlpha(110)
+            holeRadius = 65f
+            transparentCircleRadius = 70f
             setDrawCenterText(true)
-            centerText = "Goal Tracking"
-            setCenterTextSize(14f)
-            setCenterTextColor(android.graphics.Color.GRAY)
-            legend.isEnabled = false
-            setEntryLabelColor(android.graphics.Color.WHITE)
-            animateXY(1500, 1500)
+            centerText = "Spending\nIntelligence"
+            setCenterTextSize(18f)
+            setCenterTextTypeface(android.graphics.Typeface.create("sans-serif-medium", android.graphics.Typeface.BOLD))
+            setCenterTextColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_main))
+            rotationAngle = 0f
+            isRotationEnabled = true
+            isHighlightPerTapEnabled = true
+            legend.apply {
+                isEnabled = true
+                verticalAlignment = com.github.mikephil.charting.components.Legend.LegendVerticalAlignment.BOTTOM
+                horizontalAlignment = com.github.mikephil.charting.components.Legend.LegendHorizontalAlignment.CENTER
+                orientation = com.github.mikephil.charting.components.Legend.LegendOrientation.HORIZONTAL
+                setDrawInside(false)
+                xEntrySpace = 10f
+                yEntrySpace = 5f
+                yOffset = 10f
+                textSize = 11f
+                textColor = androidx.core.content.ContextCompat.getColor(context, R.color.text_secondary)
+                form = com.github.mikephil.charting.components.Legend.LegendForm.CIRCLE
+            }
+            setEntryLabelColor(androidx.core.content.ContextCompat.getColor(context, R.color.text_main))
+            setEntryLabelTextSize(10f)
+            setDrawEntryLabels(false)
+            animateY(1400, com.github.mikephil.charting.animation.Easing.EaseInOutQuad)
         }
 
-        // Trends Chart
         binding.reportBarChart.apply {
             description.isEnabled = false
             setDrawGridBackground(false)
@@ -288,10 +333,7 @@ class DashboardFragment : Fragment() {
             binding.pieChart.clear()
             return
         }
-
-        val categoryTotals = expenses.groupBy { it.category }
-            .mapValues { it.value.sumOf { exp -> exp.amount } }
-
+        val categoryTotals = expenses.groupBy { it.category }.mapValues { it.value.sumOf { exp -> exp.amount } }
         val entries = categoryTotals.map { (cat, total) -> PieEntry(total.toFloat(), cat) }
         val dataSet = PieDataSet(entries, "").apply {
             colors = listOf(
@@ -299,59 +341,73 @@ class DashboardFragment : Fragment() {
                 requireContext().getColor(R.color.chart_2),
                 requireContext().getColor(R.color.chart_3),
                 requireContext().getColor(R.color.chart_4),
-                requireContext().getColor(R.color.chart_5)
+                requireContext().getColor(R.color.chart_5),
+                requireContext().getColor(R.color.chart_6)
             )
-            valueTextSize = 10f
-            valueTextColor = android.graphics.Color.WHITE
-            sliceSpace = 3f
+            valueTextSize = 12f
+            valueTextColor = androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_main)
+            sliceSpace = 4f
+            yValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            xValuePosition = PieDataSet.ValuePosition.OUTSIDE_SLICE
+            valueLinePart1OffsetPercentage = 80f
+            valueLinePart1Length = 0.45f
+            valueLinePart2Length = 0.45f
+            valueLineWidth = 2f
+            valueLineColor = requireContext().getColor(R.color.primary)
         }
-
         binding.pieChart.data = PieData(dataSet).apply {
-            setValueFormatter(PercentFormatter())
+            setValueFormatter(PercentFormatter(binding.pieChart))
+            setValueTextSize(11f)
+            setValueTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_main))
         }
         binding.pieChart.invalidate()
     }
 
     private fun updateReportChart(expenses: List<com.smartwallet.ai.data.model.Expense>) {
-        val isWeekly = binding.chipWeekly.isChecked
+        if (expenses.isEmpty()) {
+            binding.reportBarChart.clear()
+            return
+        }
         val entries = mutableListOf<BarEntry>()
         val labels = mutableListOf<String>()
-
-        if (isWeekly) {
-            val sdf = SimpleDateFormat("EEE", Locale.getDefault())
-            for (i in 6 downTo 0) {
-                val cal = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -i) }
-                val dateStr = sdf.format(cal.time)
-                val total = expenses.filter { 
-                    val expCal = Calendar.getInstance().apply { timeInMillis = it.date }
-                    expCal.get(Calendar.DAY_OF_YEAR) == cal.get(Calendar.DAY_OF_YEAR)
-                }.sumOf { it.amount }
-                
-                entries.add(BarEntry((6-i).toFloat(), total.toFloat()))
-                labels.add(dateStr)
-            }
-        } else {
-            // Monthly weeks
-            for (i in 1..5) {
-                val total = expenses.filter { 
-                    val expCal = Calendar.getInstance().apply { timeInMillis = it.date }
-                    expCal.get(Calendar.WEEK_OF_MONTH) == i && 
-                    expCal.get(Calendar.MONTH) == Calendar.getInstance().get(Calendar.MONTH)
-                }.sumOf { it.amount }
-                entries.add(BarEntry((i-1).toFloat(), total.toFloat()))
-                labels.add("W$i")
-            }
+        val sdf = SimpleDateFormat("MMM d", Locale.getDefault())
+        for (i in 6 downTo 0) {
+            val d = Calendar.getInstance().apply { add(Calendar.DAY_OF_YEAR, -i) }
+            val dayStart = d.apply { set(Calendar.HOUR_OF_DAY, 0); set(Calendar.MINUTE, 0); set(Calendar.SECOND, 0) }.timeInMillis
+            val dayEnd = d.apply { set(Calendar.HOUR_OF_DAY, 23); set(Calendar.MINUTE, 59); set(Calendar.SECOND, 59) }.timeInMillis
+            val dailySum = expenses.filter { it.date in dayStart..dayEnd }.sumOf { it.amount }
+            entries.add(BarEntry((6 - i).toFloat(), dailySum.toFloat()))
+            labels.add(sdf.format(d.time))
         }
-
-        val dataSet = BarDataSet(entries, "Spending").apply {
+        val dataSet = BarDataSet(entries, "Spending Trend").apply {
             color = requireContext().getColor(R.color.primary)
+            valueTextColor = requireContext().getColor(R.color.text_secondary)
+            valueTextSize = 10f
             setDrawValues(false)
         }
-
         binding.reportBarChart.apply {
-            data = BarData(dataSet).apply { barWidth = 0.5f }
+            data = BarData(dataSet).apply { barWidth = 0.6f }
             xAxis.valueFormatter = IndexAxisValueFormatter(labels)
             invalidate()
+        }
+    }
+
+    private fun updateBudgetHealthUI(health: String, usagePercent: Int, remainingDays: Int) {
+        binding.tvBudgetHealth.text = health
+        binding.tvDaysRemaining.text = "$remainingDays Days Remaining"
+        val color = when (health) {
+            "Safe Spending" -> R.color.success
+            "Moderate Spending" -> R.color.warning
+            else -> R.color.danger
+        }
+        val colorInt = androidx.core.content.ContextCompat.getColor(requireContext(), color)
+        binding.tvBudgetHealth.setTextColor(colorInt)
+        if (usagePercent > 80) {
+            binding.tvSubHeader.text = "Careful! You've used $usagePercent% of budget"
+            binding.tvSubHeader.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
+        } else {
+            binding.tvSubHeader.text = "Your AI universe is in balance"
+            binding.tvSubHeader.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary))
         }
     }
 

@@ -4,6 +4,7 @@ data class AIInsightData(
     val healthScore: Int,
     val budgetStatus: BudgetStatus,
     val dailySafeLimit: Double,
+    val dailySafeMessage: String = "",
     val budgetUtilization: Int,
     val spendingInsights: List<SpendingInsight>,
     val survivalPrediction: SurvivalPrediction,

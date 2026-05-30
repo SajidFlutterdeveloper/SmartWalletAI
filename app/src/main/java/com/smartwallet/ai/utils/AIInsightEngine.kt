@@ -38,6 +38,7 @@ object AIInsightEngine {
         // 2. Daily Safe Limit
         val remainingBudget = (monthlyIncome - savingsGoal - totalSpent).coerceAtLeast(0.0)
         val dailySafeLimit = if (daysRemaining > 0) remainingBudget / daysRemaining else 0.0
+        val dailySafeMessage = "Rozana ka kharch: PKR ${dailySafeLimit.toInt()} se kam rakhain. (Keep daily spending below PKR ${dailySafeLimit.toInt()})"
 
         // 3. Smart Spending Analysis
         val categoryTotals = currentMonthExpenses.groupBy { it.category }
@@ -73,6 +74,7 @@ object AIInsightEngine {
             healthScore = healthScore,
             budgetStatus = budgetStatus,
             dailySafeLimit = dailySafeLimit,
+            dailySafeMessage = dailySafeMessage,
             budgetUtilization = budgetUtilization,
             spendingInsights = spendingInsights,
             survivalPrediction = survivalPrediction,
@@ -122,17 +124,29 @@ object AIInsightEngine {
     private fun predictSurvival(spent: Double, income: Double, goal: Double, day: Int, totalDays: Int): SurvivalPrediction {
         val budgetLimit = income - goal
         val remaining = (budgetLimit - spent).coerceAtLeast(0.0)
+        val daysRemaining = (totalDays - day + 1).coerceAtLeast(1)
+        
         val burnRate = if (day > 0) spent / day else 0.0
         val estimatedTotal = burnRate * totalDays
         
-        val prob = if (estimatedTotal <= budgetLimit) 90 else ( (budgetLimit / estimatedTotal) * 100).toInt()
+        val safeRemainingPerDay = remaining / daysRemaining
+        
+        val prob = when {
+            remaining <= 0 -> 0
+            burnRate <= safeRemainingPerDay -> 95 
+            estimatedTotal <= budgetLimit -> 85
+            estimatedTotal <= income -> 40 
+            else -> 10 
+        }
+
         val message = when {
-            prob > 80 -> "On track to survive the month comfortably."
-            prob > 50 -> "You might need to tighten your belt to reach month-end."
-            else -> "High risk of running out of budget before month-end."
+            prob >= 90 -> "Aap ka budget sahi chal raha hai. Sukoon se month guzray ga.\n(Budget is on track. Month will pass peacefully.)"
+            prob >= 70 -> "Thora mohtat rahain, lekin aap month end tak pohnch jayen gay.\n(Be careful, but you will reach month-end.)"
+            prob >= 40 -> "Khabardar! Aap bachat (savings) istemal kar rahay hain. Kharch kam karain.\n(Warning! You are using savings. Reduce spending.)"
+            else -> "Emergency! Paisay khatam honay walay hain. Udhaar se bachnay k liye kharch band karain.\n(Emergency! Money is running out. Stop spending to avoid debt.)"
         }
         
-        return SurvivalPrediction(prob.coerceIn(0, 100), (income - estimatedTotal).coerceAtLeast(0.0), message)
+        return SurvivalPrediction(prob.coerceIn(0, 100), (budgetLimit - estimatedTotal).coerceAtLeast(0.0), message)
     }
 
     private fun generateSavingsTips(categoryTotals: Map<String, Double>, totalSpent: Double, remaining: Double): List<String> {
@@ -165,8 +179,12 @@ object AIInsightEngine {
     }
 
     private fun generateMotivation(spent: Double, limit: Double, goal: Double): String {
-        return if (spent < limit * 0.5) "Excellent discipline! You are a savings champion."
-        else "Keep going! Small adjustments today lead to big freedom tomorrow."
+        return when {
+            spent < limit * 0.3 -> "MashaAllah! Aap bohat achi bachat kar rahay hain. (Excellent savings discipline!)"
+            spent < limit * 0.7 -> "Sahi rasta hai! Bas isi tarah chaltay rahain. (On the right track! Keep going.)"
+            spent < limit -> "Kharch barh raha hai, zara hath rok kar chalain. (Spending is rising, please control it.)"
+            else -> "Himmat na harain, aglay month behtar plan karain gay. (Don't lose heart, we'll plan better next month.)"
+        }
     }
 
     private fun determinePersonality(expenses: List<Expense>, categories: Map<String, Double>, totalSpent: Double, income: Double): FinancialPersonality {

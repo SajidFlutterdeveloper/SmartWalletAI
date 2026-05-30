@@ -1,37 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <!-- Primary Palette -->
-    <color name="primary">#6366F1</color>
-    <color name="primary_light">#EEF2FF</color>
-    <color name="primary_dark">#4338CA</color>
-    <color name="background">#F8FAFC</color>
-    <color name="white">#FFFFFF</color>
+    <!-- Professional Premium Palette (Tailwind Inspired) -->
+    <color name="primary">#4F46E5</color> <!-- Indigo 600 -->
+    <color name="primary_light">#EEF2FF</color> <!-- Indigo 50 -->
+    <color name="primary_dark">#3730A3</color> <!-- Indigo 800 -->
 
-    <!-- Text Colors -->
-    <color name="text_main">#1E293B</color>
-    <color name="text_secondary">#64748B</color>
+    <!-- Background & Surface -->
+    <color name="background">#F8FAFC</color> <!-- Slate 50 -->
+    <color name="surface">#FFFFFF</color>
+    <color name="surface_variant">#F1F5F9</color> <!-- Slate 100 -->
 
-    <!-- Semantic Colors -->
-    <color name="success">#10B981</color>
-    <color name="warning">#F59E0B</color>
-    <color name="danger">#EF4444</color>
-    <color name="risky">#F97316</color>
+    <!-- Text Colors (Deep & Modern) -->
+    <color name="text_main">#0F172A</color> <!-- Slate 900 -->
+    <color name="text_secondary">#475569</color> <!-- Slate 600 -->
+    <color name="text_muted">#94A3B8</color> <!-- Slate 400 -->
 
-    <!-- Chart Palette -->
+    <!-- Semantic Colors (Professional Vibrancy) -->
+    <color name="success">#059669</color> <!-- Emerald 600 -->
+    <color name="success_light">#ECFDF5</color>
+    <color name="warning">#D97706</color> <!-- Amber 600 -->
+    <color name="warning_light">#FFFBEB</color>
+    <color name="danger">#DC2626</color> <!-- Red 600 -->
+    <color name="danger_light">#FEF2F2</color>
+    <color name="info">#0284C7</color> <!-- Sky 600 -->
+
+    <!-- Professional Slate Palette -->
+    <color name="slate_50">#F8FAFC</color>
+    <color name="slate_100">#F1F5F9</color>
+    <color name="slate_200">#E2E8F0</color>
+    <color name="slate_300">#CBD5E1</color>
+    <color name="slate_400">#94A3B8</color>
+    <color name="slate_500">#64748B</color>
+    <color name="slate_600">#475569</color>
+    <color name="slate_700">#334155</color>
+    <color name="slate_800">#1E293B</color>
+    <color name="slate_900">#0F172A</color>
+
+    <!-- Chart Palette (Distinct & Professional) -->
     <color name="chart_1">#6366F1</color>
     <color name="chart_2">#8B5CF6</color>
     <color name="chart_3">#EC4899</color>
     <color name="chart_4">#F59E0B</color>
     <color name="chart_5">#10B981</color>
-    <color name="chart_6">#3B82F6</color>
+    <color name="chart_6">#0EA5E9</color>
 
-    <!-- Neutral Colors -->
-    <color name="slate_50">#F8FAFC</color>
-    <color name="slate_100">#F1F5F9</color>
-    <color name="slate_200">#E2E8F0</color>
-    <color name="slate_500">#64748B</color>
+    <color name="white">#FFFFFF</color>
+    <color name="black">#000000</color>
+    <color name="transparent">#00000000</color>
 
-    <!-- Gradient Colors -->
-    <color name="grad_start">#6366F1</color>
-    <color name="grad_end">#4338CA</color>
+    <!-- Gradient Premium -->
+    <color name="grad_start">#4F46E5</color>
+    <color name="grad_end">#1E1B4B</color>
 </resources>

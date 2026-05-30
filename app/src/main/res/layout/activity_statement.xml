@@ -20,23 +20,85 @@
             android:padding="24dp"
             android:background="@color/white">
 
-            <!-- Bank Header Style -->
-            <TextView
-                android:layout_width="wrap_content"
+            <!-- Verification Header -->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="SMART WALLET AI"
-                android:textSize="20sp"
-                android:textStyle="bold"
-                android:textColor="@color/primary"
-                android:letterSpacing="0.2"/>
+                android:background="@color/slate_50"
+                android:padding="16dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Official Financial Statement"
-                android:textSize="12sp"
-                android:textColor="@color/text_secondary"
-                android:textAllCaps="true"/>
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="VERIFIED STATEMENT"
+                        android:textColor="@color/success"
+                        android:textStyle="bold"
+                        android:textSize="12sp"
+                        android:letterSpacing="0.1"/>
+                    <TextView
+                        android:id="@+id/tvStatementHash"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SHA-256: 4f8a...2d91"
+                        android:textSize="8sp"
+                        android:textColor="@color/text_muted"
+                        android:fontFamily="monospace"/>
+                </LinearLayout>
+
+                <ImageView
+                    android:id="@+id/ivQrVerification"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_search"
+                    app:tint="@color/text_main" />
+            </RelativeLayout>
+
+            <View
+                android:layout_width="match_parent"
+                android:layout_height="1dp"
+                android:background="@color/slate_200"
+                android:layout_marginVertical="16dp"/>
+
+            <!-- Bank Header Style -->
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content">
+
+                <LinearLayout
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:orientation="vertical">
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="SMART WALLET AI"
+                        android:textSize="20sp"
+                        android:textStyle="bold"
+                        android:textColor="@color/primary"
+                        android:letterSpacing="0.2"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="ENTERPRISE FINANCIAL REPORT"
+                        android:textSize="10sp"
+                        android:textColor="@color/text_secondary"
+                        android:textStyle="bold"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"/>
+                </LinearLayout>
+
+                <ImageView
+                    android:layout_width="56dp"
+                    android:layout_height="56dp"
+                    android:layout_alignParentEnd="true"
+                    android:src="@drawable/ic_app_logo" />
+            </RelativeLayout>
 
             <View
                 android:layout_width="match_parent"
@@ -95,6 +157,23 @@
                     android:layout_height="wrap_content"
                     android:text="2023-10-27"
                     android:textColor="@color/text_main"
+                    android:textSize="13sp"
+                    android:layout_marginTop="4dp"/>
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Statement ID: "
+                    android:textColor="@color/text_secondary"
+                    android:textSize="13sp"
+                    android:layout_marginTop="4dp"/>
+                <TextView
+                    android:id="@+id/tvStatementId"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="SWAI-XXXXX"
+                    android:textColor="@color/text_main"
+                    android:textStyle="bold"
                     android:textSize="13sp"
                     android:layout_marginTop="4dp"/>
             </GridLayout>
@@ -234,14 +313,29 @@
                 android:textColor="@color/text_secondary"
                 android:textSize="10sp"/>
 
-            <TextView
+            <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="This is a computer generated document and does not require a physical signature."
+                android:layout_marginTop="16dp"
                 android:gravity="center"
-                android:layout_marginTop="4dp"
-                android:textColor="@color/text_secondary"
-                android:textSize="8sp"/>
+                android:orientation="vertical">
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="DIGITALLY SIGNED &amp; VERIFIED"
+                    android:textColor="@color/success"
+                    android:textStyle="bold"
+                    android:textSize="9sp"
+                    android:alpha="0.6"/>
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="This is a secure, tamper-proof document from SmartWalletAI Enterprise Systems."
+                    android:gravity="center"
+                    android:layout_marginTop="4dp"
+                    android:textColor="@color/text_muted"
+                    android:textSize="8sp"/>
+            </LinearLayout>
 
         </LinearLayout>
     </androidx.core.widget.NestedScrollView>

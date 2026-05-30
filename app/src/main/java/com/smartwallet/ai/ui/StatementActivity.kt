@@ -17,10 +17,26 @@ import com.smartwallet.ai.databinding.ItemStatementTransactionBinding
 import com.smartwallet.ai.utils.PreferenceManager
 import java.io.File
 import java.io.FileOutputStream
+import java.security.MessageDigest
 import java.text.SimpleDateFormat
 import java.util.*
 
 class StatementActivity : AppCompatActivity() {
+// ... existing code ...
+    private fun generateSecurityHash() {
+        try {
+            val dataToHash = transactions.joinToString("|") { "${it.id}${it.amount}${it.date}" } + preferenceManager.getUserName()
+            val digest = MessageDigest.getInstance("SHA-256")
+            val hashBytes = digest.digest(dataToHash.toByteArray())
+            val hexString = hashBytes.joinToString("") { "%02x".format(it) }
+            
+            val displayHash = "SECURE HASH: " + hexString.take(8).uppercase() + "..." + hexString.takeLast(8).uppercase()
+            binding.tvStatementHash.text = displayHash
+        } catch (e: Exception) {
+            binding.tvStatementHash.text = "HASHING ERROR"
+        }
+    }
+// ... rest of existing code ...
 
     private lateinit var binding: ActivityStatementBinding
     private lateinit var preferenceManager: PreferenceManager
@@ -38,6 +54,7 @@ class StatementActivity : AppCompatActivity() {
         transactions = intent.getSerializableExtra("DATA") as? List<Expense> ?: emptyList()
 
         setupUI(period)
+        generateSecurityHash()
         setupRecyclerView()
 
         binding.btnShareStatement.setOnClickListener {
@@ -46,9 +63,13 @@ class StatementActivity : AppCompatActivity() {
     }
 
     private fun setupUI(period: String) {
+        val statementId = "SWAI-" + UUID.randomUUID().toString().take(8).uppercase()
         binding.tvStatementName.text = preferenceManager.getUserName()
         binding.tvStatementPeriod.text = period
-        binding.tvStatementDate.text = SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.getDefault()).format(Date())
+        binding.tvStatementDate.text = SimpleDateFormat("yyyy-MM-dd HH:mm:ss (z)", Locale.getDefault()).format(Date())
+        
+        // Dynamic Statement ID
+        binding.tvStatementId.text = statementId
 
         val income = preferenceManager.getMonthlyIncome()
         val totalExpense = transactions.sumOf { it.amount }

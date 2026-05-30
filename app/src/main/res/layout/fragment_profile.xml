@@ -245,7 +245,7 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="AI &amp; Security Preferences"
+                android:text="Universe Settings"
                 android:textStyle="bold"
                 android:textColor="@color/text_main"
                 android:layout_marginTop="16dp"
@@ -271,7 +271,7 @@
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Biometric Authentication"
+                            android:text="Biometric Protection"
                             android:textColor="@color/text_main"/>
                         <com.google.android.material.switchmaterial.SwitchMaterial
                             android:id="@+id/switchBiometric"
@@ -289,17 +289,38 @@
                     <RelativeLayout
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:padding="16dp">
+                        android:padding="16dp"
+                        android:id="@+id/btnExportData">
                         <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="AI Financial Coaching"
+                            android:text="Export All Transactions (CSV)"
                             android:textColor="@color/text_main"/>
-                        <com.google.android.material.switchmaterial.SwitchMaterial
+                        <ImageView
+                            android:layout_width="20dp"
+                            android:layout_height="20dp"
+                            android:src="@drawable/ic_search"
+                            android:layout_alignParentEnd="true"
+                            app:tint="@color/text_secondary"
+                            android:rotation="180"/>
+                    </RelativeLayout>
+
+                    <View
+                        android:layout_width="match_parent"
+                        android:layout_height="1dp"
+                        android:background="@color/slate_100"
+                        android:layout_marginHorizontal="16dp"/>
+
+                    <RelativeLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:padding="16dp"
+                        android:id="@+id/btnPrivacy">
+                        <TextView
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:checked="true"
-                            android:layout_alignParentEnd="true"/>
+                            android:text="Privacy &amp; Security Policy"
+                            android:textColor="@color/text_main"/>
                     </RelativeLayout>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
