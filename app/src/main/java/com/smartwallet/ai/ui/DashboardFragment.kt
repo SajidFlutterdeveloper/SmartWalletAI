@@ -181,40 +181,65 @@ class DashboardFragment : Fragment() {
     }
 
     private fun setupObservers() {
-        val income = preferenceManager.getMonthlyIncome()
-        val currency = preferenceManager.getCurrency()
-        val goal = preferenceManager.getSavingsGoal()
-
-        binding.tvGoal.text = "$currency ${String.format(Locale.getDefault(), "%.0f", goal)}"
-
-        viewModel.totalExpenses.observe(viewLifecycleOwner) { total ->
+        viewModel.totalExpensesThisMonth.observe(viewLifecycleOwner) { total ->
             val spent = total ?: 0.0
-            val remaining = income - spent
+            val income = preferenceManager.getMonthlyIncome()
+            val goal = preferenceManager.getSavingsGoal()
+            val currency = preferenceManager.getCurrency()
 
-            binding.tvRemaining.text = "$currency ${String.format(Locale.getDefault(), "%.0f", remaining)}"
-            binding.tvIncome.text = "$currency ${String.format(Locale.getDefault(), "%.0f", income)}"
-            binding.tvExpenses.text = "$currency ${String.format(Locale.getDefault(), "%.0f", spent)}"
+            binding.tvGoal.text = "$currency ${formatAmount(goal)}"
 
-            val usagePercent = BudgetCalculator.getBudgetUsagePercentage(income, spent)
+            // Requirement 3 & 5: Reserve Savings and Prevent Negative Balance
+            val spendingBudget = (income - goal).coerceAtLeast(0.0)
+            val availableToSpend = BudgetCalculator.getAvailableSpendingBalance(income, goal, spent)
+
+            binding.tvRemaining.text = "$currency ${formatAmount(availableToSpend)}"
+            binding.tvIncome.text = "$currency ${formatAmount(income)}"
+            binding.tvExpenses.text = "$currency ${formatAmount(spent)}"
+
             val health = BudgetCalculator.getSpendingHealth(income, goal, spent)
             val remainingDays = BudgetCalculator.getRemainingDaysInMonth()
 
-            updateBudgetHealthUI(health, usagePercent, remainingDays)
+            updateBudgetHealthUI(health, remainingDays)
 
-            val currentSavings = income - spent
-            val progress = if (goal > 0) (currentSavings / goal * 100).toInt() else 0
+            // Goal Progress: Shows how much of the "Reserved" savings are still intact
+            // If spent exceeds spendingBudget, we are eating into the goal.
+            val totalLeft = (income - spent).coerceAtLeast(0.0)
+            val progress = if (income > 0) {
+                ((totalLeft / income) * 100).toInt()
+            } else {
+                0
+            }
             
-            binding.goalProgress.setProgressCompat(progress.coerceIn(0, 100), true)
-            binding.tvGoalPercent.text = "$progress%"
-            val remToGoal = (goal - currentSavings).coerceAtLeast(0.0)
-            binding.tvGoalRem.text = "$currency ${String.format(Locale.getDefault(), "%.0f", remToGoal)} to reach your goal"
+            val coercedProgress = progress.coerceIn(0, 100)
+            binding.goalProgress.setProgressCompat(coercedProgress, true)
+            binding.tvGoalPercent.text = "$coercedProgress%"
+            
+            if (spent > spendingBudget) {
+                val deficit = spent - spendingBudget
+                binding.tvGoalRem.text = "⚠️ Goal Impacted: Eating PKR ${formatAmount(deficit)} into savings"
+                binding.tvGoalRem.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
+                binding.tvGoalPercent.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
+                binding.goalProgress.setIndicatorColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
+            } else {
+                val leftToSpend = spendingBudget - spent
+                binding.tvGoalRem.text = "$currency ${formatAmount(leftToSpend)} left to spend safely"
+                binding.tvGoalRem.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary))
+                binding.tvGoalPercent.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.success))
+                binding.goalProgress.setIndicatorColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.success))
+            }
 
             viewModel.calculateInsights(income, goal)
         }
 
-        viewModel.allExpenses.observe(viewLifecycleOwner) { expenses ->
+        viewModel.expensesThisMonth.observe(viewLifecycleOwner) { expenses ->
             if (expenses != null) {
                 updatePieChart(expenses)
+            }
+        }
+
+        viewModel.allExpenses.observe(viewLifecycleOwner) { expenses ->
+            if (expenses != null) {
                 updateReportChart(expenses)
                 calculateMonthComparison(expenses)
             }
@@ -222,13 +247,52 @@ class DashboardFragment : Fragment() {
 
         viewModel.aiInsights.observe(viewLifecycleOwner) { insights ->
             if (insights.isNotEmpty()) {
-                binding.tvAICoachMessage.text = insights[0]
+                val currentText = binding.tvAICoachMessage.text.toString()
+                val newText = insights[0]
+                
+                // Update Mini Card
+                if (currentText != newText) {
+                    binding.tvAICoachMessage.animate().alpha(0f).setDuration(300).withEndAction {
+                        binding.tvAICoachMessage.text = newText
+                        binding.tvAICoachMessage.animate().alpha(1f).setDuration(300).start()
+                    }.start()
+                }
             }
+        }
+
+        viewModel.advancedInsights.observe(viewLifecycleOwner) { data ->
+            // Update Sub-Header with a dynamic narrative of the whole situation
+            binding.tvSubHeader.text = data.dynamicNarrative
+            
+            // Highlight Sub-Header if health is poor
+            if (data.healthScore < 50) {
+                binding.tvSubHeader.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
+            } else {
+                binding.tvSubHeader.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary))
+            }
+
+            // Update new dynamic cards
+            binding.tvVelocity.text = "${if (data.spendingVelocity > 0) "+" else ""}${data.spendingVelocity.toInt()}%"
+            binding.tvVelocity.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), 
+                if (data.spendingVelocity > 10) R.color.danger else if (data.spendingVelocity < -10) R.color.success else R.color.text_main))
+            
+            binding.tvStreak.text = "${data.noSpendStreak} Days"
+            binding.tvStreak.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(),
+                if (data.noSpendStreak >= 1) R.color.success else R.color.text_main))
         }
 
         viewModel.spendingForecast.observe(viewLifecycleOwner) { forecast ->
             val currency = preferenceManager.getCurrency()
-            binding.tvForecast.text = "$currency ${String.format(Locale.getDefault(), "%.0f", forecast)}"
+            binding.tvForecast.text = "$currency ${formatAmount(forecast)}"
+            
+            // Show dynamic prediction status with full calculation context
+            viewModel.advancedInsights.value?.survivalPrediction?.let { prediction ->
+                binding.tvForecastLabel.text = prediction.message
+                binding.tvForecastLabel.setTextColor(
+                    androidx.core.content.ContextCompat.getColor(requireContext(), 
+                    if (prediction.probability > 60) R.color.text_secondary else R.color.danger)
+                )
+            }
         }
     }
 
@@ -392,9 +456,16 @@ class DashboardFragment : Fragment() {
         }
     }
 
-    private fun updateBudgetHealthUI(health: String, usagePercent: Int, remainingDays: Int) {
+    private fun updateBudgetHealthUI(health: String, remainingDays: Int) {
+        val income = preferenceManager.getMonthlyIncome()
+        val goal = preferenceManager.getSavingsGoal()
+        val spent = viewModel.totalExpensesThisMonth.value ?: 0.0
+        val dailyLimit = BudgetCalculator.calculateSafeDailyLimit(income, goal, spent)
+        val currency = preferenceManager.getCurrency()
+
         binding.tvBudgetHealth.text = health
-        binding.tvDaysRemaining.text = "$remainingDays Days Remaining"
+        binding.tvDaysRemaining.text = "$currency ${formatAmount(dailyLimit)} / day | $remainingDays Days Left"
+        
         val color = when (health) {
             "Safe Spending" -> R.color.success
             "Moderate Spending" -> R.color.warning
@@ -402,13 +473,10 @@ class DashboardFragment : Fragment() {
         }
         val colorInt = androidx.core.content.ContextCompat.getColor(requireContext(), color)
         binding.tvBudgetHealth.setTextColor(colorInt)
-        if (usagePercent > 80) {
-            binding.tvSubHeader.text = "Careful! You've used $usagePercent% of budget"
-            binding.tvSubHeader.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.danger))
-        } else {
-            binding.tvSubHeader.text = "Your AI universe is in balance"
-            binding.tvSubHeader.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.text_secondary))
-        }
+    }
+
+    private fun formatAmount(amount: Double): String {
+        return String.format(Locale.getDefault(), "%.0f", amount)
     }
 
     override fun onDestroyView() {

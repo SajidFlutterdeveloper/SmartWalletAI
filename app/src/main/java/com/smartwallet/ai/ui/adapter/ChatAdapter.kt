@@ -16,6 +16,8 @@ class ChatAdapter : RecyclerView.Adapter<ChatAdapter.ViewHolder>() {
         notifyItemInserted(messages.size - 1)
     }
 
+    fun getMessages(): List<ChatMessage> = messages
+
     class ViewHolder(val binding: ItemChatMessageBinding) : RecyclerView.ViewHolder(binding.root)
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {

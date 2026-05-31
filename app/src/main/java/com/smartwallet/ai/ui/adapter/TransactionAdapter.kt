@@ -14,7 +14,8 @@ import java.util.*
 class TransactionAdapter(
     private val onPrintReceipt: (Expense) -> Unit,
     private val onEdit: (Expense) -> Unit,
-    private val onDelete: (Expense) -> Unit
+    private val onDelete: (Expense) -> Unit,
+    private val isUnusual: (Expense) -> Boolean = { false }
 ) : ListAdapter<Expense, TransactionAdapter.ViewHolder>(DiffCallback()) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): ViewHolder {
@@ -32,6 +33,14 @@ class TransactionAdapter(
         fun bind(expense: Expense) {
             binding.tvCategory.text = expense.category
             binding.tvAmount.text = "PKR ${String.format("%.0f", expense.amount)}"
+            
+            // Unusual Activity highlight
+            if (isUnusual(expense)) {
+                binding.tvAmount.setTextColor(android.graphics.Color.RED)
+                binding.tvCategory.text = "${expense.category} ⚠️"
+            } else {
+                binding.tvAmount.setTextColor(android.graphics.Color.BLACK) // Or use a color resource
+            }
             
             val context = binding.root.context
             

@@ -14,7 +14,11 @@ data class AIInsightData(
     val motivationMessage: String,
     val financialPersonality: FinancialPersonality,
     val weeklySummary: WeeklySummary?,
-    val challenges: List<SmartChallenge>
+    val challenges: List<SmartChallenge>,
+    val dynamicNarrative: String = "",
+    val spendingVelocity: Double = 0.0, // % change vs last period
+    val noSpendStreak: Int = 0,
+    val topMerchant: String? = null
 )
 
 enum class BudgetStatus { ON_TRACK, NEEDS_ATTENTION, AT_RISK }
@@ -29,7 +33,7 @@ data class SpendingInsight(
 
 data class SurvivalPrediction(
     val probability: Int, // 0-100%
-    val estimatedRemainingBalance: Double,
+    val estimatedTotalSpend: Double,
     val message: String
 )
 

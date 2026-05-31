@@ -42,6 +42,9 @@ class TransactionsFragment : Fragment() {
         setupRecyclerView()
         setupSearchAndFilters()
         setupObservers()
+
+        val preferenceManager = com.smartwallet.ai.utils.PreferenceManager(requireContext())
+        viewModel.calculateInsights(preferenceManager.getMonthlyIncome(), preferenceManager.getSavingsGoal())
     }
 
     private fun setupSearchAndFilters() {
@@ -101,6 +104,9 @@ class TransactionsFragment : Fragment() {
                         Toast.makeText(requireContext(), "History updated", Toast.LENGTH_SHORT).show()
                     }
                     .show()
+            },
+            isUnusual = { expense ->
+                com.smartwallet.ai.utils.AIInsightEngine.isTransactionUnusual(expense, fullList)
             }
         )
         binding.rvTransactions.apply {
@@ -114,6 +120,15 @@ class TransactionsFragment : Fragment() {
         viewModel.allExpenses.observe(viewLifecycleOwner) { expenses ->
             fullList = expenses
             applyFilters()
+        }
+
+        viewModel.aiInsights.observe(viewLifecycleOwner) { insights ->
+            if (insights.isNotEmpty()) {
+                binding.cardTransactionInsight.visibility = View.VISIBLE
+                binding.tvTransactionInsight.text = insights.random()
+            } else {
+                binding.cardTransactionInsight.visibility = View.GONE
+            }
         }
     }
 

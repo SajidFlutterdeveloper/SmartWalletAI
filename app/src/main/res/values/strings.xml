@@ -15,5 +15,8 @@
     <string name="total_spent">Total Spent</string>
     <string name="remaining">Remaining Budget</string>
     <string name="add_expense">Add New Expense</string>
-    <string name="default_web_client_id">338267613995-xxxxxxxxxxxx.apps.googleusercontent.com</string>
+    <string name="text_or">OR</string>
+    <string name="signup_with_google">Sign up with Google</string>
+    <!-- Actual Web Client ID from Firebase Console (Project fir-app-f24e6) -->
+    <string name="default_web_client_id">338267613995-ge8bpid90fc5eb41epit6dupv29dpuii.apps.googleusercontent.com</string>
 </resources>

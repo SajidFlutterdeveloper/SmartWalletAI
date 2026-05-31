@@ -26,6 +26,7 @@ class ChatActivity : AppCompatActivity() {
 
         preferenceManager = PreferenceManager(this)
         setupChat()
+        setupSuggestions()
 
         binding.btnBack.setOnClickListener { finish() }
         
@@ -38,8 +39,26 @@ class ChatActivity : AppCompatActivity() {
             } else false
         }
 
-        // Welcome Message
-        addAIMessage("Hello! I'm your Smart Wallet AI. How can I help you with your finances today?")
+        generateDynamicWelcome()
+    }
+
+    private fun setupSuggestions() {
+        binding.chipStatus.setOnClickListener { sendMessage("How much have I spent?") }
+        binding.chipTips.setOnClickListener { sendMessage("Give me some saving tips") }
+        binding.chipJoke.setOnClickListener { sendMessage("Tell me a joke") }
+        binding.chipForecast.setOnClickListener { sendMessage("What is my forecast?") }
+    }
+
+    private fun generateDynamicWelcome() {
+        val name = preferenceManager.getUserName()
+        val income = preferenceManager.getMonthlyIncome()
+        val goal = preferenceManager.getSavingsGoal()
+        val spent = viewModel.totalExpensesThisMonth.value ?: 0.0
+        val remaining = (income - goal - spent)
+        
+        // Fully dynamic greeting from the engine
+        val welcomeText = AIChatEngine.getResponse("hi", emptyList(), emptyList(), income, goal)
+        addAIMessage(welcomeText.replace("Friend", name))
     }
 
     private fun setupChat() {
@@ -51,27 +70,34 @@ class ChatActivity : AppCompatActivity() {
         }
     }
 
-    private fun sendMessage() {
-        val text = binding.etMessage.text.toString().trim()
+    private fun sendMessage(customText: String? = null) {
+        val text = customText ?: binding.etMessage.text.toString().trim()
         if (text.isNotEmpty()) {
             chatAdapter.addMessage(ChatMessage(text, true))
-            binding.etMessage.setText("")
+            if (customText == null) binding.etMessage.setText("")
             binding.rvChat.scrollToPosition(chatAdapter.itemCount - 1)
             
+            binding.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
             processAIResponse(text)
         }
     }
 
     private fun processAIResponse(query: String) {
-        val expenses = viewModel.allExpenses.value ?: emptyList()
+        val expenses = viewModel.expensesThisMonth.value ?: emptyList()
+        val allTimeExpenses = viewModel.allExpenses.value ?: emptyList()
         val income = preferenceManager.getMonthlyIncome()
         val goal = preferenceManager.getSavingsGoal()
+        val history = chatAdapter.getMessages()
+        
+        // Show typing indicator
+        binding.tvTyping.visibility = android.view.View.VISIBLE
         
         // Simulate AI processing delay
         binding.root.postDelayed({
-            val response = AIChatEngine.getResponse(query, expenses, income, goal)
+            binding.tvTyping.visibility = android.view.View.GONE
+            val response = AIChatEngine.getResponse(query, expenses, allTimeExpenses, income, goal, history)
             addAIMessage(response)
-        }, 1000)
+        }, 1200)
     }
 
     private fun addAIMessage(text: String) {

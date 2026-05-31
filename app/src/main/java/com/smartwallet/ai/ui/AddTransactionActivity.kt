@@ -16,6 +16,7 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
+import com.smartwallet.ai.R
 import com.smartwallet.ai.data.local.AppDatabase
 import com.smartwallet.ai.data.model.Expense
 import com.smartwallet.ai.databinding.ActivityAddTransactionBinding
@@ -34,6 +35,7 @@ class AddTransactionActivity : AppCompatActivity() {
     private val userId = FirebaseAuth.getInstance().currentUser?.uid ?: ""
     private var photoUri: Uri? = null
     private var currentInputMethod: String = "Manual"
+    private var selectedDate: Long = System.currentTimeMillis()
 
     private val categories = arrayOf("Food", "Fuel", "Shopping", "Bills", "Health", "Education", "Transfer", "Entertainment", "Salary", "Grocery", "Transport", "Other")
 
@@ -43,6 +45,7 @@ class AddTransactionActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupCategorySpinner()
+        updateDateDisplay()
         checkIntent()
         setupListeners()
     }
@@ -68,6 +71,8 @@ class AddTransactionActivity : AppCompatActivity() {
     }
 
     private fun populateFields(expense: Expense) {
+        selectedDate = expense.date
+        updateDateDisplay()
         binding.etAmount.setText(expense.amount.toString())
         (binding.etCategory as? AutoCompleteTextView)?.setText(expense.category, false)
         binding.etNote.setText(expense.note)
@@ -75,7 +80,32 @@ class AddTransactionActivity : AppCompatActivity() {
         binding.btnDelete.visibility = View.VISIBLE
     }
 
+    private fun updateDateDisplay() {
+        val sdf = java.text.SimpleDateFormat("dd MMM yyyy", Locale.getDefault())
+        binding.etDate.setText(sdf.format(Date(selectedDate)))
+    }
+
+    private fun showDatePicker() {
+        val cal = Calendar.getInstance()
+        cal.timeInMillis = selectedDate
+        
+        val dpd = android.app.DatePickerDialog(
+            this,
+            { _, year, month, day ->
+                val newCal = Calendar.getInstance()
+                newCal.set(year, month, day)
+                selectedDate = newCal.timeInMillis
+                updateDateDisplay()
+            },
+            cal.get(Calendar.YEAR),
+            cal.get(Calendar.MONTH),
+            cal.get(Calendar.DAY_OF_MONTH)
+        )
+        dpd.show()
+    }
+
     private fun setupListeners() {
+        binding.etDate.setOnClickListener { showDatePicker() }
         binding.btnVoice.setOnClickListener { startVoiceRecognition() }
         binding.btnScan.setOnClickListener { launchCamera() }
         binding.btnUpload.setOnClickListener { galleryLauncher.launch("image/*") }
@@ -84,6 +114,48 @@ class AddTransactionActivity : AppCompatActivity() {
             editingExpense?.let { 
                 viewModel.deleteExpense(it)
                 finish()
+            }
+        }
+
+        binding.etAmount.addTextChangedListener(object : android.text.TextWatcher {
+            override fun beforeTextChanged(s: CharSequence?, start: Int, count: Int, after: Int) {}
+            override fun onTextChanged(s: CharSequence?, start: Int, before: Int, count: Int) {
+                updatePreTransactionInsight()
+            }
+            override fun afterTextChanged(s: android.text.Editable?) {}
+        })
+    }
+
+    private fun updatePreTransactionInsight() {
+        val amount = binding.etAmount.text.toString().toDoubleOrNull() ?: 0.0
+        if (amount <= 0) {
+            binding.tvPreTransactionInsight.visibility = View.GONE
+            return
+        }
+
+        val preferenceManager = com.smartwallet.ai.utils.PreferenceManager(this)
+        val income = preferenceManager.getMonthlyIncome()
+        val goal = preferenceManager.getSavingsGoal()
+        val spentSoFar = viewModel.totalExpensesThisMonth.value ?: 0.0
+        
+        val newTotal = spentSoFar + amount
+        val budgetLimit = income - goal
+        
+        binding.tvPreTransactionInsight.visibility = View.VISIBLE
+        
+        when {
+            newTotal > income -> {
+                binding.tvPreTransactionInsight.text = "⚠️ This will put you into negative balance!"
+                binding.tvPreTransactionInsight.setTextColor(getColor(R.color.danger))
+            }
+            newTotal > budgetLimit -> {
+                binding.tvPreTransactionInsight.text = "🚩 This will use PKR ${(newTotal - budgetLimit).toInt()} from your savings goal."
+                binding.tvPreTransactionInsight.setTextColor(getColor(R.color.warning))
+            }
+            else -> {
+                val dailyLimit = com.smartwallet.ai.utils.BudgetCalculator.calculateSafeDailyLimit(income, goal, newTotal)
+                binding.tvPreTransactionInsight.text = "✅ Within budget. Remaining daily safe: PKR ${dailyLimit.toInt()}"
+                binding.tvPreTransactionInsight.setTextColor(getColor(R.color.success))
             }
         }
     }
@@ -160,6 +232,7 @@ class AddTransactionActivity : AppCompatActivity() {
         val shopName = binding.etShopName.text.toString()
 
         if (amount != null && category.isNotEmpty()) {
+            showLoading(true)
             val expense = Expense(
                 id = editingExpense?.id ?: 0,
                 userId = userId,
@@ -167,19 +240,40 @@ class AddTransactionActivity : AppCompatActivity() {
                 category = category,
                 note = note,
                 shopName = if (shopName.isEmpty()) null else shopName,
-                date = editingExpense?.date ?: System.currentTimeMillis(),
+                date = selectedDate,
                 inputMethod = if (editingExpense != null) editingExpense!!.inputMethod else currentInputMethod
             )
             
-            if (editingExpense != null) viewModel.updateExpense(expense)
-            else viewModel.addExpense(expense)
+            lifecycleScope.launch {
+                try {
+                    showLoading(true)
+                    if (editingExpense != null) viewModel.updateExpense(expense)
+                    else viewModel.addExpense(expense)
 
-            // Haptic Feedback & Success
-            binding.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-            Toast.makeText(this, "Universe Synchronized Successfully!", Toast.LENGTH_SHORT).show()
-            finish()
+                    // Haptic Feedback & Success
+                    binding.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                    Toast.makeText(this@AddTransactionActivity, "Universe Synchronized Successfully!", Toast.LENGTH_SHORT).show()
+                    finish()
+                } catch (e: Exception) {
+                    Toast.makeText(this@AddTransactionActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
+                } finally {
+                    showLoading(false)
+                }
+            }
         } else {
             Toast.makeText(this, "Please fill Amount and Category", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showLoading(show: Boolean) {
+        if (show) {
+            binding.loadingOverlay.visibility = View.VISIBLE
+            val rotate = android.view.animation.AnimationUtils.loadAnimation(this, R.anim.rotate_universe)
+            findViewById<View>(R.id.ivLoadingLogo)?.startAnimation(rotate)
+        } else {
+            binding.loadingOverlay.visibility = View.GONE
+            findViewById<View>(R.id.ivLoadingLogo)?.clearAnimation()
+        }
+        binding.btnSave.isEnabled = !show
     }
 }

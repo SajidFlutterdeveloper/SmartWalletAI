@@ -34,14 +34,6 @@ class MainActivity : AppCompatActivity() {
         
         preferenceManager = PreferenceManager(this)
 
-        if (!preferenceManager.isProfileCompleted()) {
-            val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("FIRST_TIME", true)
-            startActivity(intent)
-            finish()
-            return
-        }
-
         NotificationHelper.createNotificationChannel(this)
         requestNotificationPermission()
         scheduleDailyReminder()

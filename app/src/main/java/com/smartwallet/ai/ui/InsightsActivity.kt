@@ -69,7 +69,7 @@ class InsightsActivity : AppCompatActivity() {
 
     private fun updateHealthCard(income: Double, goal: Double, totalSpent: Double) {
         val health = BudgetCalculator.getSpendingHealth(income, goal, totalSpent)
-        val usagePercent = BudgetCalculator.getBudgetUsagePercentage(income, totalSpent)
+        val usagePercent = BudgetCalculator.getBudgetUsagePercentage(income, goal, totalSpent)
         val dailyLimit = BudgetCalculator.calculateSafeDailyLimit(income, goal, totalSpent)
 
         binding.tvHealthStatus.text = health

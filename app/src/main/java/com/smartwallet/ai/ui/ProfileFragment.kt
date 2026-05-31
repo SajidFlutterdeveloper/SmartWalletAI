@@ -13,16 +13,24 @@ import android.view.ViewGroup
 import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.bumptech.glide.Glide
 import com.smartwallet.ai.R
 import com.google.firebase.auth.FirebaseAuth
 import com.smartwallet.ai.data.model.AIInsightData
+import com.smartwallet.ai.data.model.UserProfile
+import com.smartwallet.ai.data.remote.FirestoreManager
 import com.smartwallet.ai.databinding.FragmentProfileBinding
 import com.smartwallet.ai.ui.viewmodel.ExpenseViewModel
 import com.smartwallet.ai.utils.PreferenceManager
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
 import java.util.*
@@ -32,6 +40,7 @@ class ProfileFragment : Fragment() {
     private var _binding: FragmentProfileBinding? = null
     private val binding get() = _binding!!
     private lateinit var preferenceManager: PreferenceManager
+    private val auth by lazy { FirebaseAuth.getInstance() }
     private val viewModel: ExpenseViewModel by viewModels()
 
     override fun onCreateView(
@@ -79,12 +88,21 @@ class ProfileFragment : Fragment() {
     private fun updateProfileImage() {
         val profileUrl = preferenceManager.getProfilePicUrl()
         if (!profileUrl.isNullOrEmpty()) {
-            val file = File(profileUrl)
-            if (file.exists()) {
+            if (profileUrl.startsWith("http")) {
                 Glide.with(this)
-                    .load(file)
+                    .load(profileUrl)
                     .centerCrop()
+                    .placeholder(R.drawable.ic_app_logo)
                     .into(binding.ivProfilePic)
+            } else {
+                val file = File(profileUrl)
+                if (file.exists()) {
+                    Glide.with(this)
+                        .load(file)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_app_logo)
+                        .into(binding.ivProfilePic)
+                }
             }
         }
     }
@@ -107,6 +125,35 @@ class ProfileFragment : Fragment() {
             val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://smartwallet.ai/privacy"))
             startActivity(browserIntent)
         }
+
+        binding.btnLogout.setOnClickListener {
+            showLogoutConfirmation()
+        }
+    }
+
+    private fun showLogoutConfirmation() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout? This will allow you to sign in with a different account.")
+            .setPositiveButton("Yes") { _, _ ->
+                // 1. Sign out from Firebase
+                auth.signOut()
+                
+                // 2. Sign out from Google to clear the "Auto-select" session
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build()
+                GoogleSignIn.getClient(requireActivity(), gso).signOut()
+                
+                // 3. Clear local preferences
+                preferenceManager.clearData()
+
+                startActivity(Intent(requireContext(), LoginActivity::class.java))
+                requireActivity().finishAffinity()
+            }
+            .setNegativeButton("No", null)
+            .show()
     }
 
     private fun setupObservers() {
@@ -151,7 +198,21 @@ class ProfileFragment : Fragment() {
     }
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        uri?.let { saveProfileImageLocally(it) }
+        uri?.let { 
+            saveProfileImageLocally(it) 
+            uploadProfileImageToCloud(it)
+        }
+    }
+
+    private fun uploadProfileImageToCloud(uri: Uri) {
+        val uid = auth.currentUser?.uid ?: return
+        lifecycleScope.launch {
+            val cloudUrl = FirestoreManager.uploadProfilePicture(uid, uri)
+            if (cloudUrl != null) {
+                preferenceManager.setProfilePicUrl(cloudUrl)
+                Log.d("ProfileCloud", "Image uploaded: $cloudUrl")
+            }
+        }
     }
 
     private fun saveProfileImageLocally(uri: Uri) {
@@ -187,10 +248,53 @@ class ProfileFragment : Fragment() {
         val goal = binding.etSavingsGoal.text.toString().toDoubleOrNull() ?: 0.0
         
         if (name.isNotEmpty() && income > 0) {
-            preferenceManager.saveProfile(name, "", income, goal, 1, "PKR")
-            binding.tvDisplayUserName.text = name
-            Toast.makeText(requireContext(), "Profile Synchronized!", Toast.LENGTH_SHORT).show()
+            val user = auth.currentUser
+            if (user != null) {
+                val profile = UserProfile(
+                    uid = user.uid,
+                    name = name,
+                    monthlyIncome = income,
+                    savingsGoal = goal,
+                    profilePicUrl = preferenceManager.getProfilePicUrl(),
+                    profileCompleted = true
+                )
+
+                lifecycleScope.launch {
+                    try {
+                        showLoading(true)
+                        val success = FirestoreManager.saveUserProfile(profile)
+                        preferenceManager.saveProfile(name, "", income, goal, 1, "PKR")
+                        binding.tvDisplayUserName.text = name
+                        
+                        showLoading(false)
+                        if (success) {
+                            Toast.makeText(requireContext(), "Profile Cloud-Synchronized!", Toast.LENGTH_SHORT).show()
+                        } else {
+                            Toast.makeText(requireContext(), "Updated Locally (Offline)", Toast.LENGTH_SHORT).show()
+                        }
+                        
+                        // Redirect to Dashboard
+                        findNavController().navigate(R.id.navigation_dashboard)
+                    } catch (e: Exception) {
+                        showLoading(false)
+                        Log.e("ProfileSync", "Sync failed", e)
+                        findNavController().navigate(R.id.navigation_dashboard)
+                    }
+                }
+            }
         }
+    }
+
+    private fun showLoading(show: Boolean) {
+        if (show) {
+            binding.loadingOverlay.visibility = View.VISIBLE
+            val rotate = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.rotate_universe)
+            binding.root.findViewById<View>(R.id.ivLoadingLogo)?.startAnimation(rotate)
+        } else {
+            binding.loadingOverlay.visibility = View.GONE
+            binding.root.findViewById<View>(R.id.ivLoadingLogo)?.clearAnimation()
+        }
+        binding.btnSaveProfile.isEnabled = !show
     }
 
     override fun onDestroyView() {

@@ -21,6 +21,15 @@ interface ExpenseDao {
     @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId")
     fun getTotalExpenses(userId: String): LiveData<Double?>
 
+    @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId AND date >= :startTime AND date <= :endTime")
+    fun getExpensesInRange(userId: String, startTime: Long, endTime: Long): LiveData<Double?>
+
+    @Query("SELECT SUM(amount) FROM expenses WHERE userId = :userId AND date >= :startTime")
+    fun getExpensesFrom(userId: String, startTime: Long): LiveData<Double?>
+
+    @Query("SELECT * FROM expenses WHERE userId = :userId AND date >= :startTime ORDER BY date DESC")
+    fun getExpensesFromList(userId: String, startTime: Long): LiveData<List<Expense>>
+
     @Query("SELECT * FROM expenses WHERE isSynced = 0")
     suspend fun getUnsyncedExpenses(): List<Expense>
 

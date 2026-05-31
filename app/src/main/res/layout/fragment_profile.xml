@@ -1,349 +1,417 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@color/slate_50">
+    android:layout_height="match_parent">
 
-    <LinearLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:orientation="vertical"
-        android:paddingBottom="100dp">
+        android:layout_height="match_parent"
+        android:background="@color/slate_50">
 
-        <!-- Top Header Card -->
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardHeader"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:cardElevation="0dp"
-            app:cardCornerRadius="0dp"
-            android:backgroundTint="@color/primary">
-
-            <LinearLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="32dp"
-                android:gravity="center">
-
-                <RelativeLayout
-                    android:layout_width="130dp"
-                    android:layout_height="130dp">
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/ivProfilePic"
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:scaleType="centerCrop"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
-                        android:src="@drawable/ic_launcher_foreground"
-                        android:background="@color/white"
-                        android:padding="2dp"
-                        app:strokeWidth="4dp"
-                        app:strokeColor="@color/white" />
-
-                    <com.google.android.material.floatingactionbutton.FloatingActionButton
-                        android:id="@+id/fabEditPhoto"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:layout_alignParentBottom="true"
-                        android:layout_alignParentEnd="true"
-                        app:fabSize="mini"
-                        app:srcCompat="@drawable/ic_edit_modern"
-                        app:tint="@color/white"
-                        android:backgroundTint="@color/primary_dark"
-                        app:elevation="2dp"/>
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/tvDisplayUserName"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="User Name"
-                    android:textColor="@color/white"
-                    android:textSize="22sp"
-                    android:textStyle="bold"
-                    android:layout_marginTop="16dp"/>
-
-                <TextView
-                    android:id="@+id/tvUserPersonalityTag"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="AI Financial Saver"
-                    android:textColor="@color/white"
-                    android:alpha="0.8"
-                    android:textSize="12sp"
-                    android:textAllCaps="true"
-                    android:letterSpacing="0.1"
-                    android:layout_marginTop="4dp"
-                    android:background="@drawable/bg_personality_tag"
-                    android:paddingHorizontal="12dp"
-                    android:paddingVertical="4dp"/>
-            </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
-
-        <!-- AI Insights Quick View -->
         <LinearLayout
-            android:id="@+id/layoutAiSummary"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:paddingHorizontal="16dp"
-            android:layout_marginTop="-30dp"
-            android:weightSum="3">
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="4dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Health"
-                        android:textSize="10sp"
-                        android:textColor="@color/text_secondary"/>
-                    <TextView
-                        android:id="@+id/tvQuickHealth"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="92%"
-                        android:textStyle="bold"
-                        android:textColor="@color/success"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="4dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Score"
-                        android:textSize="10sp"
-                        android:textColor="@color/text_secondary"/>
-                    <TextView
-                        android:id="@+id/tvQuickScore"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="850"
-                        android:textStyle="bold"
-                        android:textColor="@color/primary"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-
-            <com.google.android.material.card.MaterialCardView
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_weight="1"
-                android:layout_margin="4dp"
-                app:cardCornerRadius="16dp"
-                app:cardElevation="4dp">
-                <LinearLayout
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="12dp"
-                    android:gravity="center">
-                    <TextView
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Days"
-                        android:textSize="10sp"
-                        android:textColor="@color/text_secondary"/>
-                    <TextView
-                        android:id="@+id/tvQuickDays"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="12"
-                        android:textStyle="bold"
-                        android:textColor="@color/warning"/>
-                </LinearLayout>
-            </com.google.android.material.card.MaterialCardView>
-        </LinearLayout>
-
-        <!-- Form Section -->
-        <LinearLayout
-            android:id="@+id/layoutForm"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical"
-            android:padding="20dp">
+            android:paddingBottom="100dp">
 
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Personal Information"
-                android:textStyle="bold"
-                android:textColor="@color/text_main"
-                android:layout_marginBottom="16dp"
-                android:layout_marginTop="8dp"/>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Full Name"
-                app:startIconDrawable="@drawable/ic_edit_modern"
-                android:layout_marginBottom="12dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etName"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="textPersonName"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Monthly Income"
-                app:startIconDrawable="@drawable/ic_search"
-                android:layout_marginBottom="12dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etIncome"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <com.google.android.material.textfield.TextInputLayout
-                style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:hint="Monthly Savings Goal"
-                app:startIconDrawable="@drawable/ic_search"
-                android:layout_marginBottom="12dp">
-                <com.google.android.material.textfield.TextInputEditText
-                    android:id="@+id/etSavingsGoal"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:inputType="numberDecimal"/>
-            </com.google.android.material.textfield.TextInputLayout>
-
-            <!-- AI Preferences -->
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Universe Settings"
-                android:textStyle="bold"
-                android:textColor="@color/text_main"
-                android:layout_marginTop="16dp"
-                android:layout_marginBottom="16dp"/>
-
+            <!-- Top Header Card -->
             <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardHeader"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                app:cardCornerRadius="16dp"
                 app:cardElevation="0dp"
-                app:strokeWidth="1dp"
-                app:strokeColor="@color/slate_200">
+                app:cardCornerRadius="0dp"
+                android:backgroundTint="@color/primary">
 
                 <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical">
+                    android:orientation="vertical"
+                    android:padding="32dp"
+                    android:gravity="center">
 
                     <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Biometric Protection"
-                            android:textColor="@color/text_main"/>
-                        <com.google.android.material.switchmaterial.SwitchMaterial
-                            android:id="@+id/switchBiometric"
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:layout_alignParentEnd="true"/>
-                    </RelativeLayout>
+                        android:layout_width="130dp"
+                        android:layout_height="130dp">
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/slate_100"
-                        android:layout_marginHorizontal="16dp"/>
+                        <com.google.android.material.imageview.ShapeableImageView
+                            android:id="@+id/ivProfilePic"
+                            android:layout_width="match_parent"
+                            android:layout_height="match_parent"
+                            android:scaleType="centerCrop"
+                            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
+                            android:src="@drawable/ic_launcher_foreground"
+                            android:background="@color/white"
+                            android:padding="2dp"
+                            app:strokeWidth="4dp"
+                            app:strokeColor="@color/white" />
 
-                    <RelativeLayout
-                        android:layout_width="match_parent"
-                        android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:id="@+id/btnExportData">
-                        <TextView
+                        <com.google.android.material.floatingactionbutton.FloatingActionButton
+                            android:id="@+id/fabEditPhoto"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:text="Export All Transactions (CSV)"
-                            android:textColor="@color/text_main"/>
-                        <ImageView
-                            android:layout_width="20dp"
-                            android:layout_height="20dp"
-                            android:src="@drawable/ic_search"
+                            android:layout_alignParentBottom="true"
                             android:layout_alignParentEnd="true"
-                            app:tint="@color/text_secondary"
-                            android:rotation="180"/>
+                            app:fabSize="mini"
+                            app:srcCompat="@drawable/ic_edit_modern"
+                            app:tint="@color/white"
+                            android:backgroundTint="@color/primary_dark"
+                            app:elevation="2dp"/>
                     </RelativeLayout>
 
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="1dp"
-                        android:background="@color/slate_100"
-                        android:layout_marginHorizontal="16dp"/>
-
-                    <RelativeLayout
-                        android:layout_width="match_parent"
+                    <TextView
+                        android:id="@+id/tvDisplayUserName"
+                        android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:padding="16dp"
-                        android:id="@+id/btnPrivacy">
-                        <TextView
-                            android:layout_width="wrap_content"
-                            android:layout_height="wrap_content"
-                            android:text="Privacy &amp; Security Policy"
-                            android:textColor="@color/text_main"/>
-                    </RelativeLayout>
+                        android:text="User Name"
+                        android:textColor="@color/white"
+                        android:textSize="22sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="16dp"/>
+
+                    <TextView
+                        android:id="@+id/tvUserPersonalityTag"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="AI Financial Saver"
+                        android:textColor="@color/white"
+                        android:alpha="0.8"
+                        android:textSize="12sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"
+                        android:layout_marginTop="4dp"
+                        android:background="@drawable/bg_personality_tag"
+                        android:paddingHorizontal="12dp"
+                        android:paddingVertical="4dp"/>
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnSaveProfile"
+            <!-- AI Insights Quick View -->
+            <LinearLayout
+                android:id="@+id/layoutAiSummary"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Update My Universe"
-                android:layout_marginTop="24dp"
-                app:cornerRadius="16dp"
-                android:textStyle="bold"
-                style="@style/Widget.MaterialComponents.Button"/>
+                android:layout_height="wrap_content"
+                android:orientation="horizontal"
+                android:paddingHorizontal="16dp"
+                android:layout_marginTop="-30dp"
+                android:weightSum="3">
 
-            <com.google.android.material.button.MaterialButton
-                android:id="@+id/btnLogout"
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Health"
+                            android:textSize="10sp"
+                            android:textColor="@color/text_secondary"/>
+                        <TextView
+                            android:id="@+id/tvQuickHealth"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="92%"
+                            android:textStyle="bold"
+                            android:textColor="@color/success"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Score"
+                            android:textSize="10sp"
+                            android:textColor="@color/text_secondary"/>
+                        <TextView
+                            android:id="@+id/tvQuickScore"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="850"
+                            android:textStyle="bold"
+                            android:textColor="@color/primary"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:layout_margin="4dp"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="4dp">
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="12dp"
+                        android:gravity="center">
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Days"
+                            android:textSize="10sp"
+                            android:textColor="@color/text_secondary"/>
+                        <TextView
+                            android:id="@+id/tvQuickDays"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="12"
+                            android:textStyle="bold"
+                            android:textColor="@color/warning"/>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+            </LinearLayout>
+
+            <!-- Form Section -->
+            <LinearLayout
+                android:id="@+id/layoutForm"
                 android:layout_width="match_parent"
-                android:layout_height="60dp"
-                android:text="Log Out"
-                android:textColor="@color/danger"
-                android:layout_marginTop="8dp"
-                style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                android:layout_height="wrap_content"
+                android:orientation="vertical"
+                android:padding="20dp">
 
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Personal Information"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_main"
+                    android:layout_marginBottom="16dp"
+                    android:layout_marginTop="8dp"/>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Full Name"
+                    app:startIconDrawable="@drawable/ic_edit_modern"
+                    android:layout_marginBottom="12dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etName"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="textPersonName"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Monthly Income"
+                    app:startIconDrawable="@drawable/ic_search"
+                    android:layout_marginBottom="12dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etIncome"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:hint="Monthly Savings Goal"
+                    app:startIconDrawable="@drawable/ic_search"
+                    android:layout_marginBottom="12dp">
+                    <com.google.android.material.textfield.TextInputEditText
+                        android:id="@+id/etSavingsGoal"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:inputType="numberDecimal"/>
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <!-- AI Preferences -->
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Universe Settings"
+                    android:textStyle="bold"
+                    android:textColor="@color/text_main"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"/>
+
+                <com.google.android.material.card.MaterialCardView
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    app:cardCornerRadius="16dp"
+                    app:cardElevation="0dp"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/slate_200">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical">
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Biometric Protection"
+                                android:textColor="@color/text_main"/>
+                            <com.google.android.material.switchmaterial.SwitchMaterial
+                                android:id="@+id/switchBiometric"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:layout_alignParentEnd="true"/>
+                        </RelativeLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/slate_100"
+                            android:layout_marginHorizontal="16dp"/>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp"
+                            android:id="@+id/btnExportData">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Export All Transactions (CSV)"
+                                android:textColor="@color/text_main"/>
+                            <ImageView
+                                android:layout_width="20dp"
+                                android:layout_height="20dp"
+                                android:src="@drawable/ic_search"
+                                android:layout_alignParentEnd="true"
+                                app:tint="@color/text_secondary"
+                                android:rotation="180"/>
+                        </RelativeLayout>
+
+                        <View
+                            android:layout_width="match_parent"
+                            android:layout_height="1dp"
+                            android:background="@color/slate_100"
+                            android:layout_marginHorizontal="16dp"/>
+
+                        <RelativeLayout
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:padding="16dp"
+                            android:id="@+id/btnPrivacy">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Privacy &amp; Security Policy"
+                                android:textColor="@color/text_main"/>
+                        </RelativeLayout>
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnSaveProfile"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="Update My Universe"
+                    android:layout_marginTop="24dp"
+                    app:cornerRadius="16dp"
+                    android:textStyle="bold"
+                    style="@style/Widget.MaterialComponents.Button"/>
+
+                <com.google.android.material.button.MaterialButton
+                    android:id="@+id/btnLogout"
+                    android:layout_width="match_parent"
+                    android:layout_height="60dp"
+                    android:text="Log Out"
+                    android:textColor="@color/danger"
+                    android:layout_marginTop="8dp"
+                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
+
+            </LinearLayout>
         </LinearLayout>
-    </LinearLayout>
-</androidx.core.widget.NestedScrollView>
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D9000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/circular_progress_drawable"
+                    android:alpha="0.3"/>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivLoadingLogo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_app_logo"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"/>
+
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/primary"
+                    android:indeterminateTintMode="src_atop"
+                    style="@style/Widget.AppCompat.ProgressBar"/>
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/tvLoadingMessage"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:text="Updating Universe..."
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:letterSpacing="0.1"
+                android:textStyle="bold" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:text="Synchronizing Personal Space"
+                android:textColor="@color/white"
+                android:alpha="0.6"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </FrameLayout>
+</RelativeLayout>

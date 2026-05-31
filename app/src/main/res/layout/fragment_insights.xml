@@ -12,6 +12,7 @@
         app:elevation="0dp">
 
         <TextView
+            android:id="@+id/tvTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingHorizontal="24dp"
@@ -241,6 +242,52 @@
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
 
+                <!-- Top Merchant Card -->
+                <com.google.android.material.card.MaterialCardView
+                    android:id="@+id/cardTopMerchant"
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginBottom="16dp"
+                    app:cardBackgroundColor="@color/slate_50"
+                    app:cardCornerRadius="20dp"
+                    app:cardElevation="0dp"
+                    android:visibility="gone"
+                    app:strokeWidth="1dp"
+                    app:strokeColor="@color/slate_200">
+
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:padding="20dp">
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Top Merchant Activity"
+                            android:textColor="@color/text_secondary"
+                            android:textSize="12sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:id="@+id/tvTopMerchantName"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:layout_marginTop="4dp"
+                            android:text="Merchant Name"
+                            android:textColor="@color/text_main"
+                            android:textSize="18sp"
+                            android:textStyle="bold" />
+
+                        <TextView
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="Most frequent spending location"
+                            android:textColor="@color/text_muted"
+                            android:textSize="10sp" />
+                    </LinearLayout>
+                </com.google.android.material.card.MaterialCardView>
+
                 <!-- Motivation Banner -->
                 <com.google.android.material.card.MaterialCardView
                     android:layout_width="match_parent"
@@ -265,6 +312,7 @@
 
             <!-- Spending Insights List -->
             <TextView
+                android:id="@+id/tvInsightsHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -284,6 +332,7 @@
 
             <!-- Challenges Section -->
             <TextView
+                android:id="@+id/tvChallengesHeader"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginStart="24dp"
@@ -365,15 +414,35 @@
                 </LinearLayout>
             </com.google.android.material.card.MaterialCardView>
 
-            <!-- Start Chat Button -->
+            <!-- Savings History Recap (Requirement 4) -->
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="24dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginBottom="12dp"
+                android:text="Historical Savings Performance"
+                android:textColor="@color/text_main"
+                android:textSize="18sp"
+                android:textStyle="bold" />
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvSavingsHistory"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:clipToPadding="false"
+                android:orientation="horizontal"
+                android:paddingHorizontal="20dp"
+                android:paddingBottom="24dp" />
+
             <com.google.android.material.button.MaterialButton
                 android:id="@+id/btnAskAI"
                 style="@style/Widget.Material3.Button.TonalButton"
                 android:layout_width="match_parent"
                 android:layout_height="64dp"
                 android:layout_marginHorizontal="20dp"
-                android:layout_marginTop="24dp"
-                android:text="Chat with AI Financial Coach"
+                android:layout_marginTop="8dp"
+                android:text="Financial Advisor Chat"
                 android:textStyle="bold"
                 app:cornerRadius="16dp"
                 app:icon="@drawable/ic_nav_ai"
