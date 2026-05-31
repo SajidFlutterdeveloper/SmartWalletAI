@@ -232,8 +232,6 @@ class DashboardFragment : Fragment() {
                 binding.tvGoalPercent.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.success))
                 binding.goalProgress.setIndicatorColor(androidx.core.content.ContextCompat.getColor(requireContext(), R.color.success))
             }
-
-            viewModel.calculateInsights(income, goal)
         }
 
         viewModel.expensesThisMonth.observe(viewLifecycleOwner) { expenses ->

@@ -400,6 +400,7 @@
                             android:textSize="10sp" />
                     </LinearLayout>
                 </com.google.android.material.card.MaterialCardView>
+
             </androidx.gridlayout.widget.GridLayout>
 
             <!-- Savings Progress -->

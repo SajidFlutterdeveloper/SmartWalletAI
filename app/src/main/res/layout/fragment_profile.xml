@@ -24,67 +24,103 @@
                 app:cardCornerRadius="0dp"
                 android:backgroundTint="@color/primary">
 
-                <LinearLayout
+                <androidx.constraintlayout.widget.ConstraintLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:orientation="vertical"
-                    android:padding="32dp"
-                    android:gravity="center">
+                    android:padding="32dp">
 
-                    <RelativeLayout
-                        android:layout_width="130dp"
-                        android:layout_height="130dp">
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnToggleEdit"
+                        style="@style/Widget.Material3.Button.TonalButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Edit Profile"
+                        app:icon="@drawable/ic_edit_modern"
+                        app:iconSize="16dp"
+                        app:cornerRadius="20dp"
+                        android:textSize="12sp"
+                        android:paddingHorizontal="16dp"
+                        app:layout_constraintTop_toTopOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        android:textColor="@color/primary"
+                        app:backgroundTint="@color/white"/>
 
-                        <com.google.android.material.imageview.ShapeableImageView
-                            android:id="@+id/ivProfilePic"
-                            android:layout_width="match_parent"
-                            android:layout_height="match_parent"
-                            android:scaleType="centerCrop"
-                            app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
-                            android:src="@drawable/ic_launcher_foreground"
-                            android:background="@color/white"
-                            android:padding="2dp"
-                            app:strokeWidth="4dp"
-                            app:strokeColor="@color/white" />
+                    <LinearLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:orientation="vertical"
+                        android:gravity="center"
+                        app:layout_constraintTop_toBottomOf="@id/btnToggleEdit"
+                        android:layout_marginTop="8dp">
 
-                        <com.google.android.material.floatingactionbutton.FloatingActionButton
-                            android:id="@+id/fabEditPhoto"
+                        <RelativeLayout
+                            android:layout_width="130dp"
+                            android:layout_height="130dp">
+
+                            <com.google.android.material.imageview.ShapeableImageView
+                                android:id="@+id/ivProfilePic"
+                                android:layout_width="match_parent"
+                                android:layout_height="match_parent"
+                                android:scaleType="centerCrop"
+                                app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
+                                android:src="@drawable/ic_launcher_foreground"
+                                android:background="@color/white"
+                                android:padding="2dp"
+                                app:strokeWidth="4dp"
+                                app:strokeColor="@color/white" />
+
+                            <com.google.android.material.card.MaterialCardView
+                                android:id="@+id/fabEditPhoto"
+                                android:layout_width="32dp"
+                                android:layout_height="32dp"
+                                android:layout_alignParentBottom="true"
+                                android:layout_alignParentEnd="true"
+                                android:layout_marginBottom="4dp"
+                                android:layout_marginEnd="4dp"
+                                app:cardBackgroundColor="@color/primary"
+                                app:cardCornerRadius="20dp"
+                                app:cardElevation="4dp"
+                                app:strokeWidth="2dp"
+                                app:strokeColor="@color/white"
+                                android:clickable="true"
+                                android:focusable="true"
+                                android:visibility="gone">
+
+                                <ImageView
+                                    android:layout_width="match_parent"
+                                    android:layout_height="match_parent"
+                                    android:padding="7dp"
+                                    android:src="@drawable/ic_edit_modern"
+                                    app:tint="@color/white" />
+                            </com.google.android.material.card.MaterialCardView>
+                        </RelativeLayout>
+
+                        <TextView
+                            android:id="@+id/tvDisplayUserName"
                             android:layout_width="wrap_content"
                             android:layout_height="wrap_content"
-                            android:layout_alignParentBottom="true"
-                            android:layout_alignParentEnd="true"
-                            app:fabSize="mini"
-                            app:srcCompat="@drawable/ic_edit_modern"
-                            app:tint="@color/white"
-                            android:backgroundTint="@color/primary_dark"
-                            app:elevation="2dp"/>
-                    </RelativeLayout>
+                            android:text="User Name"
+                            android:textColor="@color/white"
+                            android:textSize="22sp"
+                            android:textStyle="bold"
+                            android:layout_marginTop="16dp"/>
 
-                    <TextView
-                        android:id="@+id/tvDisplayUserName"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="User Name"
-                        android:textColor="@color/white"
-                        android:textSize="22sp"
-                        android:textStyle="bold"
-                        android:layout_marginTop="16dp"/>
-
-                    <TextView
-                        android:id="@+id/tvUserPersonalityTag"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="AI Financial Saver"
-                        android:textColor="@color/white"
-                        android:alpha="0.8"
-                        android:textSize="12sp"
-                        android:textAllCaps="true"
-                        android:letterSpacing="0.1"
-                        android:layout_marginTop="4dp"
-                        android:background="@drawable/bg_personality_tag"
-                        android:paddingHorizontal="12dp"
-                        android:paddingVertical="4dp"/>
-                </LinearLayout>
+                        <TextView
+                            android:id="@+id/tvUserPersonalityTag"
+                            android:layout_width="wrap_content"
+                            android:layout_height="wrap_content"
+                            android:text="AI Financial Saver"
+                            android:textColor="@color/white"
+                            android:alpha="0.8"
+                            android:textSize="12sp"
+                            android:textAllCaps="true"
+                            android:letterSpacing="0.1"
+                            android:layout_marginTop="4dp"
+                            android:background="@drawable/bg_personality_tag"
+                            android:paddingHorizontal="12dp"
+                            android:paddingVertical="4dp"/>
+                    </LinearLayout>
+                </androidx.constraintlayout.widget.ConstraintLayout>
             </com.google.android.material.card.MaterialCardView>
 
             <!-- AI Insights Quick View -->
@@ -203,12 +239,14 @@
                     android:layout_marginTop="8dp"/>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilName"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Full Name"
                     app:startIconDrawable="@drawable/ic_edit_modern"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etName"
                         android:layout_width="match_parent"
@@ -217,12 +255,14 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilIncome"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Monthly Income"
                     app:startIconDrawable="@drawable/ic_search"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etIncome"
                         android:layout_width="match_parent"
@@ -231,12 +271,14 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/tilSavingsGoal"
                     style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
                     android:hint="Monthly Savings Goal"
                     app:startIconDrawable="@drawable/ic_search"
-                    android:layout_marginBottom="12dp">
+                    android:layout_marginBottom="12dp"
+                    android:enabled="false">
                     <com.google.android.material.textfield.TextInputEditText
                         android:id="@+id/etSavingsGoal"
                         android:layout_width="match_parent"
@@ -280,7 +322,8 @@
                                 android:id="@+id/switchBiometric"
                                 android:layout_width="wrap_content"
                                 android:layout_height="wrap_content"
-                                android:layout_alignParentEnd="true"/>
+                                android:layout_alignParentEnd="true"
+                                android:enabled="false"/>
                         </RelativeLayout>
 
                         <View
@@ -333,19 +376,33 @@
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
                     android:text="Update My Profile"
-                    android:layout_marginTop="24dp"
+                    android:layout_marginTop="32dp"
                     app:cornerRadius="16dp"
                     android:textStyle="bold"
-                    style="@style/Widget.MaterialComponents.Button"/>
+                    style="@style/Widget.MaterialComponents.Button"
+                    android:visibility="gone"/>
 
                 <com.google.android.material.button.MaterialButton
                     android:id="@+id/btnLogout"
+                    style="@style/Widget.Material3.Button.TonalButton"
                     android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:text="Log Out"
+                    android:layout_height="62dp"
+                    android:layout_marginTop="20dp"
+                    android:text="Sign Out"
                     android:textColor="@color/danger"
-                    android:layout_marginTop="8dp"
-                    style="@style/Widget.MaterialComponents.Button.TextButton"/>
+                    app:backgroundTint="@color/danger_light"
+                    app:cornerRadius="20dp"
+                    app:icon="@drawable/ic_nav_history"
+                    app:iconGravity="textStart"
+                    app:iconPadding="12dp"
+                    app:iconSize="22dp"
+                    app:iconTint="@color/danger"
+                    android:letterSpacing="0.08"
+                    android:textStyle="bold"
+                    app:strokeColor="@color/danger"
+                    app:strokeWidth="1dp"
+                    android:elevation="0dp"
+                    android:stateListAnimator="@null"/>
 
             </LinearLayout>
         </LinearLayout>

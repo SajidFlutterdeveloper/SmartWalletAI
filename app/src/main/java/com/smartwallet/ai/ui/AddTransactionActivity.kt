@@ -66,8 +66,11 @@ class AddTransactionActivity : AppCompatActivity() {
         }
 
         val action = intent.getStringExtra("ACTION")
-        if (action == "VOICE") startVoiceRecognition()
-        else if (action == "SCAN") launchCamera()
+        when (action) {
+            "VOICE" -> startVoiceRecognition()
+            "SCAN" -> launchCamera()
+            "GALLERY" -> galleryLauncher.launch("image/*")
+        }
     }
 
     private fun populateFields(expense: Expense) {

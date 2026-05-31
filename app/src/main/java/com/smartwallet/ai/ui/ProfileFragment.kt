@@ -42,6 +42,7 @@ class ProfileFragment : Fragment() {
     private lateinit var preferenceManager: PreferenceManager
     private val auth by lazy { FirebaseAuth.getInstance() }
     private val viewModel: ExpenseViewModel by viewModels()
+    private var isEditMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -108,6 +109,10 @@ class ProfileFragment : Fragment() {
     }
 
     private fun setupListeners() {
+        binding.btnToggleEdit.setOnClickListener {
+            toggleEditMode()
+        }
+
         binding.fabEditPhoto.setOnClickListener {
             requestPermissionAndPickImage()
         }
@@ -127,8 +132,35 @@ class ProfileFragment : Fragment() {
         }
 
         binding.btnLogout.setOnClickListener {
-            showLogoutConfirmation()
+            it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
+                it.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                showLogoutConfirmation()
+            }.start()
         }
+    }
+
+    private fun toggleEditMode() {
+        isEditMode = !isEditMode
+        
+        // Update Button UI
+        if (isEditMode) {
+            binding.btnToggleEdit.text = "Cancel"
+            binding.btnToggleEdit.setIconResource(R.drawable.ic_search) // Using search as a close/cancel icon for now
+            binding.btnSaveProfile.visibility = View.VISIBLE
+            binding.fabEditPhoto.visibility = View.VISIBLE
+        } else {
+            binding.btnToggleEdit.text = "Edit Profile"
+            binding.btnToggleEdit.setIconResource(R.drawable.ic_edit_modern)
+            binding.btnSaveProfile.visibility = View.GONE
+            binding.fabEditPhoto.visibility = View.GONE
+            loadProfileData() // Reset data
+        }
+
+        // Enable/Disable Fields
+        binding.tilName.isEnabled = isEditMode
+        binding.tilIncome.isEnabled = isEditMode
+        binding.tilSavingsGoal.isEnabled = isEditMode
+        binding.switchBiometric.isEnabled = isEditMode
     }
 
     private fun showLogoutConfirmation() {
@@ -246,6 +278,7 @@ class ProfileFragment : Fragment() {
         val name = binding.etName.text.toString()
         val income = binding.etIncome.text.toString().toDoubleOrNull() ?: 0.0
         val goal = binding.etSavingsGoal.text.toString().toDoubleOrNull() ?: 0.0
+        val biometric = binding.switchBiometric.isChecked
         
         if (name.isNotEmpty() && income > 0) {
             val user = auth.currentUser
@@ -262,26 +295,34 @@ class ProfileFragment : Fragment() {
                 lifecycleScope.launch {
                     try {
                         showLoading(true)
-                        val success = FirestoreManager.saveUserProfile(profile)
+                        
+                        // 1. Save locally first (Ensures biometric state is stored immediately)
                         preferenceManager.saveProfile(name, "", income, goal, 1, "PKR")
+                        preferenceManager.setBiometricEnabled(biometric)
                         binding.tvDisplayUserName.text = name
+                        
+                        // 2. Try to sync with Cloud
+                        val success = FirestoreManager.saveUserProfile(profile)
                         
                         showLoading(false)
                         if (success) {
-                            Toast.makeText(requireContext(), "Profile Cloud-Synchronized!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(requireContext(), "Universe Synchronized Successfully! ✨", Toast.LENGTH_SHORT).show()
                         } else {
-                            Toast.makeText(requireContext(), "Updated Locally (Offline)", Toast.LENGTH_SHORT).show()
+                            // Local data is safe, only cloud sync failed
+                            Toast.makeText(requireContext(), "Saved locally. Cloud sync pending (Offline) ☁️", Toast.LENGTH_LONG).show()
                         }
                         
-                        // Redirect to Dashboard
-                        findNavController().navigate(R.id.navigation_dashboard)
+                        toggleEditMode() // Exit edit mode
                     } catch (e: Exception) {
                         showLoading(false)
                         Log.e("ProfileSync", "Sync failed", e)
-                        findNavController().navigate(R.id.navigation_dashboard)
+                        Toast.makeText(requireContext(), "Error saving: ${e.message}", Toast.LENGTH_SHORT).show()
+                        toggleEditMode()
                     }
                 }
             }
+        } else {
+            Toast.makeText(requireContext(), "Please enter valid name and income", Toast.LENGTH_SHORT).show()
         }
     }
 
