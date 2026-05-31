@@ -10,6 +10,12 @@ class ExpenseRepository(private val expenseDao: ExpenseDao) {
 
     fun getTotalExpenses(userId: String): LiveData<Double?> = expenseDao.getTotalExpenses(userId)
 
+    fun getExpensesThisMonth(userId: String, startTime: Long): LiveData<List<Expense>> = 
+        expenseDao.getExpensesFromList(userId, startTime)
+
+    fun getTotalExpensesThisMonth(userId: String, startTime: Long): LiveData<Double?> = 
+        expenseDao.getExpensesFrom(userId, startTime)
+
     suspend fun insert(expense: Expense) {
         expenseDao.insertExpense(expense)
     }

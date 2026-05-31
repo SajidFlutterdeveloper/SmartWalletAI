@@ -1,16 +1,52 @@
 <?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <style name="Theme.SmartWalletAI" parent="Theme.MaterialComponents.Light.NoActionBar">
-        <item name="colorPrimary">#4299E1</item>
-        <item name="colorPrimaryDark">#2B6CB0</item>
-        <item name="colorAccent">#48BB78</item>
+<resources xmlns:tools="http://schemas.android.com/tools">
+
+    <style name="Theme.SmartWalletAI" parent="Theme.Material3.Light.NoActionBar">
+        <!-- Main Colors -->
+        <item name="colorPrimary">@color/primary</item>
+        <item name="colorOnPrimary">@color/white</item>
+        <item name="colorPrimaryContainer">@color/primary_light</item>
+        <item name="colorOnPrimaryContainer">@color/primary_dark</item>
+
+        <item name="colorSecondary">@color/info</item>
+        <item name="colorOnSecondary">@color/white</item>
+
+        <item name="android:windowBackground">@color/background</item>
+        <item name="android:statusBarColor">@color/background</item>
+        <item name="android:windowLightStatusBar">true</item>
+
+        <item name="colorSurface">@color/surface</item>
+        <item name="colorOnSurface">@color/text_main</item>
+        <item name="colorSurfaceVariant">@color/surface_variant</item>
+        <item name="colorOnSurfaceVariant">@color/text_secondary</item>
+
+        <!-- Typography -->
+        <item name="android:fontFamily">sans-serif</item>
+
+        <!-- Bottom Nav -->
+        <item name="bottomNavigationStyle">@style/App.BottomNav</item>
+    </style>
+
+    <style name="App.BottomNav" parent="Widget.Material3.BottomNavigationView">
+        <item name="backgroundTint">@color/surface</item>
+        <item name="itemIconTint">@color/nav_item_color</item>
+        <item name="itemTextColor">@color/nav_item_color</item>
+        <item name="itemActiveIndicatorStyle">@style/App.BottomNav.ActiveIndicator</item>
+    </style>
+
+    <style name="App.BottomNav.ActiveIndicator" parent="Widget.Material3.BottomNavigationView.ActiveIndicator">
+        <item name="android:color">@color/primary_light</item>
     </style>
 
     <style name="ShapeAppearanceOverlay.App.CornerSize50Percent" parent="">
         <item name="cornerSize">50%</item>
     </style>
 
-    <style name="CircleAppearance">
-        <item name="cornerSize">50%</item>
+    <style name="AppCard" parent="Widget.Material3.CardView.Elevated">
+        <item name="cardBackgroundColor">@color/surface</item>
+        <item name="cardElevation">2dp</item>
+        <item name="shapeAppearance">@style/ShapeAppearance.Material3.MediumComponent</item>
+        <item name="strokeWidth">0dp</item>
     </style>
+
 </resources>

@@ -17,6 +17,9 @@ import com.smartwallet.ai.databinding.ActivityMainBinding
 import com.smartwallet.ai.utils.BiometricHelper
 import com.smartwallet.ai.utils.NotificationHelper
 import com.smartwallet.ai.utils.PreferenceManager
+import android.content.Context
+import android.view.View
+import java.util.*
 
 class MainActivity : AppCompatActivity() {
 
@@ -24,30 +27,75 @@ class MainActivity : AppCompatActivity() {
     private lateinit var navController: NavController
     private lateinit var preferenceManager: PreferenceManager
 
+    private var lastAuthTime: Long = 0
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         
         preferenceManager = PreferenceManager(this)
-        if (!preferenceManager.isProfileCompleted()) {
-            val intent = Intent(this, ProfileActivity::class.java)
-            intent.putExtra("FIRST_TIME", true)
-            startActivity(intent)
-            finish()
-            return
-        }
 
         NotificationHelper.createNotificationChannel(this)
         requestNotificationPermission()
+        scheduleDailyReminder()
         
+        performSecurityCheck()
+    }
+
+    private fun scheduleDailyReminder() {
+        val intent = Intent(this, com.smartwallet.ai.utils.ReminderReceiver::class.java)
+        val pendingIntent = android.app.PendingIntent.getBroadcast(
+            this, 0, intent, android.app.PendingIntent.FLAG_IMMUTABLE or android.app.PendingIntent.FLAG_UPDATE_CURRENT
+        )
+        val alarmManager = getSystemService(Context.ALARM_SERVICE) as android.app.AlarmManager
+        
+        val calendar = Calendar.getInstance().apply {
+            timeInMillis = System.currentTimeMillis()
+            set(Calendar.HOUR_OF_DAY, 21) // 9 PM
+            set(Calendar.MINUTE, 0)
+        }
+        
+        if (calendar.timeInMillis < System.currentTimeMillis()) {
+            calendar.add(Calendar.DAY_OF_YEAR, 1)
+        }
+
+        alarmManager.setInexactRepeating(
+            android.app.AlarmManager.RTC_WAKEUP,
+            calendar.timeInMillis,
+            android.app.AlarmManager.INTERVAL_DAY,
+            pendingIntent
+        )
+    }
+
+    override fun onResume() {
+        super.onResume()
+        // Enterprise Security: If app was in background for more than 3 minutes, re-authenticate
+        val sessionTimeout = 180000L // 3 Minutes
+        if (System.currentTimeMillis() - lastAuthTime > sessionTimeout) {
+            performSecurityCheck()
+        }
+    }
+
+    private fun performSecurityCheck() {
         if (preferenceManager.isBiometricEnabled() && BiometricHelper.isBiometricAvailable(this)) {
-            BiometricHelper.showBiometricPrompt(this, onSuccess = {
+            // Ensure binding is initialized before hiding root
+            if (!::binding.isInitialized) {
                 initUI()
+            }
+            
+            // Anti-Peek: Ensure UI is hidden during authentication
+            binding.root.visibility = View.GONE
+            
+            BiometricHelper.showBiometricPrompt(this, onSuccess = {
+                lastAuthTime = System.currentTimeMillis()
+                binding.root.visibility = View.VISIBLE
             }, onError = { error ->
-                Toast.makeText(this, "Security Error: $error", Toast.LENGTH_SHORT).show()
+                Toast.makeText(this, "Security Access Denied: $error", Toast.LENGTH_SHORT).show()
                 finish()
             })
         } else {
-            initUI()
+            if (!::binding.isInitialized) {
+                initUI()
+            }
         }
     }
 
@@ -56,6 +104,27 @@ class MainActivity : AppCompatActivity() {
         setContentView(binding.root)
 
         setupNavigation()
+        setupFab()
+    }
+
+    private fun setupFab() {
+        binding.fabAdd.setOnClickListener {
+            try {
+                binding.fabAdd.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+            } catch (e: Exception) {}
+            
+            // Animation for FAB
+            binding.fabAdd.animate()
+                .rotationBy(45f)
+                .scaleX(1.1f)
+                .scaleY(1.1f)
+                .setDuration(150)
+                .withEndAction {
+                    binding.fabAdd.animate().scaleX(1.0f).scaleY(1.0f).rotation(0f).setDuration(150).start()
+                    navController.navigate(R.id.navigation_add_expense)
+                }
+                .start()
+        }
     }
 
     private fun setupNavigation() {
@@ -65,6 +134,41 @@ class MainActivity : AppCompatActivity() {
 
         // Connect bottom navigation to navigation controller
         binding.bottomNavigation.setupWithNavController(navController)
+        
+        // WhatsApp-like smooth selection animation with Haptic Feedback
+        binding.bottomNavigation.setOnItemSelectedListener { item ->
+            if (item.itemId != navController.currentDestination?.id) {
+                // Haptic feedback
+                try {
+                    binding.bottomNavigation.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                } catch (e: Exception) {}
+
+                // Bounce animation for icon
+                val itemView = binding.bottomNavigation.findViewById<View>(item.itemId)
+                itemView?.animate()
+                    ?.scaleX(1.15f)
+                    ?.scaleY(1.15f)
+                    ?.setDuration(150)
+                    ?.setInterpolator(android.view.animation.OvershootInterpolator())
+                    ?.withEndAction {
+                        itemView.animate().scaleX(1.0f).scaleY(1.0f).setDuration(150).start()
+                    }
+                    ?.start()
+
+                // Navigate with smooth fragment transitions (Slide Left/Right)
+                val navOptions = androidx.navigation.NavOptions.Builder()
+                    .setLaunchSingleTop(true)
+                    .setRestoreState(true)
+                    .setEnterAnim(R.anim.slide_in_right)
+                    .setExitAnim(R.anim.slide_out_left)
+                    .setPopEnterAnim(R.anim.slide_in_left)
+                    .setPopExitAnim(R.anim.slide_out_right)
+                    .build()
+                
+                navController.navigate(item.itemId, null, navOptions)
+            }
+            true
+        }
     }
 
     private fun requestNotificationPermission() {

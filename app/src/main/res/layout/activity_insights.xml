@@ -1,53 +1,156 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
-    android:padding="24dp"
-    android:background="#E6FFFA">
+    android:background="@color/slate_50">
 
-    <ImageView
-        android:layout_width="100dp"
-        android:layout_height="100dp"
-        android:layout_gravity="center"
-        android:src="@android:drawable/ic_dialog_info"
-        app:tint="#319795"
-        android:layout_marginTop="24dp"
-        android:layout_marginBottom="24dp"/>
-
-    <TextView
+    <com.google.android.material.appbar.AppBarLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:text="AI Mental Health &amp; Wealth Diagnosis"
-        android:textSize="24sp"
-        android:textStyle="bold"
-        android:textColor="#285E61"
-        android:gravity="center"
-        android:layout_marginBottom="32dp"/>
+        android:background="@color/white"
+        app:elevation="0dp">
 
-    <androidx.cardview.widget.CardView
+        <com.google.android.material.appbar.MaterialToolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:title="AI Financial Insights"
+            app:titleCentered="true"
+            app:titleTextColor="@color/text_main" />
+    </com.google.android.material.appbar.AppBarLayout>
+
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_marginBottom="24dp"
-        app:cardCornerRadius="20dp"
-        app:cardElevation="8dp"
-        app:cardBackgroundColor="#FFFFFF">
-        
-        <ScrollView
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
+
+        <LinearLayout
             android:layout_width="match_parent"
-            android:layout_height="match_parent">
-            
-            <TextView
-                android:id="@+id/tvInsights"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:paddingBottom="32dp">
+
+            <!-- AI Diagnosis Card -->
+            <androidx.cardview.widget.CardView
+                android:id="@+id/cardHealth"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:padding="32dp"
-                android:text="AI is analyzing your spending patterns, health risks, and mental stress indicators..."
-                android:textSize="18sp"
-                android:textColor="#2D3748"
-                android:lineSpacingExtra="10dp"/>
-        </ScrollView>
-    </androidx.cardview.widget.CardView>
+                android:layout_margin="16dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp">
 
-</LinearLayout>
+                <LinearLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:background="@drawable/bg_card_gradient"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Spending Wellness Score"
+                        android:textColor="@color/white"
+                        android:alpha="0.8"
+                        android:textSize="12sp"
+                        android:textAllCaps="true"
+                        android:letterSpacing="0.1"/>
+
+                    <TextView
+                        android:id="@+id/tvHealthStatus"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="Analyzing..."
+                        android:textColor="@color/white"
+                        android:textSize="26sp"
+                        android:textStyle="bold"
+                        android:layout_marginTop="4dp"/>
+
+                    <ProgressBar
+                        android:id="@+id/pbBudgetUsage"
+                        style="?android:attr/progressBarStyleHorizontal"
+                        android:layout_width="match_parent"
+                        android:layout_height="8dp"
+                        android:layout_marginTop="20dp"
+                        android:progress="0"
+                        android:progressDrawable="@drawable/custom_progress_drawable" />
+
+                    <GridLayout
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:columnCount="2"
+                        android:layout_marginTop="16dp">
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:orientation="vertical">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Used Budget"
+                                android:textColor="@color/white"
+                                android:alpha="0.7"
+                                android:textSize="10sp"/>
+                            <TextView
+                                android:id="@+id/tvBudgetText"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="0%"
+                                android:textColor="@color/white"
+                                android:textStyle="bold"
+                                android:textSize="14sp"/>
+                        </LinearLayout>
+
+                        <LinearLayout
+                            android:layout_width="0dp"
+                            android:layout_height="wrap_content"
+                            android:layout_columnWeight="1"
+                            android:orientation="vertical"
+                            android:gravity="end">
+                            <TextView
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="Daily Safe Limit"
+                                android:textColor="@color/white"
+                                android:alpha="0.7"
+                                android:textSize="10sp"/>
+                            <TextView
+                                android:id="@+id/tvDailyLimit"
+                                android:layout_width="wrap_content"
+                                android:layout_height="wrap_content"
+                                android:text="PKR 0"
+                                android:textColor="@color/white"
+                                android:textStyle="bold"
+                                android:textSize="14sp"/>
+                        </LinearLayout>
+                    </GridLayout>
+
+                </LinearLayout>
+            </androidx.cardview.widget.CardView>
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="AI Mental Health &amp; Wealth Diagnosis"
+                android:textColor="@color/text_main"
+                android:textSize="18sp"
+                android:textStyle="bold"
+                android:layout_marginStart="20dp"
+                android:layout_marginTop="8dp"
+                android:layout_marginBottom="12dp"/>
+
+            <androidx.recyclerview.widget.RecyclerView
+                android:id="@+id/rvInsights"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:nestedScrollingEnabled="false"
+                android:clipToPadding="false"
+                android:paddingBottom="16dp"/>
+
+        </LinearLayout>
+    </androidx.core.widget.NestedScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>

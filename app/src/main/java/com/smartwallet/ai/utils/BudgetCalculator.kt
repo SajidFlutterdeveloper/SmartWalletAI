@@ -13,13 +13,21 @@ object BudgetCalculator {
     }
 
     fun calculateSafeDailyLimit(income: Double, savingsGoal: Double, currentExpenses: Double): Double {
-        val usableBudget = income - savingsGoal - currentExpenses
+        val spendingLimit = income - savingsGoal
+        val availableToSpend = (spendingLimit - currentExpenses).coerceAtLeast(0.0)
         val remainingDays = getRemainingDaysInMonth()
-        return if (remainingDays > 0 && usableBudget > 0) usableBudget / remainingDays else 0.0
+        return if (remainingDays > 0) availableToSpend / remainingDays else 0.0
     }
 
-    fun getBudgetUsagePercentage(income: Double, currentExpenses: Double): Int {
-        return if (income > 0) ((currentExpenses / income) * 100).toInt() else 0
+    fun getAvailableSpendingBalance(income: Double, savingsGoal: Double, currentExpenses: Double): Double {
+        val spendingLimit = income - savingsGoal
+        return (spendingLimit - currentExpenses).coerceAtLeast(0.0)
+    }
+
+    fun getBudgetUsagePercentage(income: Double, savingsGoal: Double, currentExpenses: Double): Int {
+        val spendingLimit = income - savingsGoal
+        if (spendingLimit <= 0) return 100
+        return ((currentExpenses / spendingLimit) * 100).toInt().coerceIn(0, 100)
     }
 
     fun getSpendingHealth(income: Double, savingsGoal: Double, currentExpenses: Double): String {

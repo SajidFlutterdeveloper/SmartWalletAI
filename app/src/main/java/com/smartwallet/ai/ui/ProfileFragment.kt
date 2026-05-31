@@ -10,16 +10,30 @@ import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.view.animation.DecelerateInterpolator
 import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.appcompat.app.AlertDialog
 import androidx.core.content.ContextCompat
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
+import com.google.android.gms.auth.api.signin.GoogleSignIn
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions
 import com.bumptech.glide.Glide
+import com.smartwallet.ai.R
 import com.google.firebase.auth.FirebaseAuth
+import com.smartwallet.ai.data.model.AIInsightData
+import com.smartwallet.ai.data.model.UserProfile
+import com.smartwallet.ai.data.remote.FirestoreManager
 import com.smartwallet.ai.databinding.FragmentProfileBinding
+import com.smartwallet.ai.ui.viewmodel.ExpenseViewModel
 import com.smartwallet.ai.utils.PreferenceManager
+import kotlinx.coroutines.launch
 import java.io.File
 import java.io.FileOutputStream
+import java.util.*
 
 class ProfileFragment : Fragment() {
 
@@ -27,7 +41,8 @@ class ProfileFragment : Fragment() {
     private val binding get() = _binding!!
     private lateinit var preferenceManager: PreferenceManager
     private val auth by lazy { FirebaseAuth.getInstance() }
-    // private var isUploadInProgress = false // Removed as it's no longer needed for local storage
+    private val viewModel: ExpenseViewModel by viewModels()
+    private var isEditMode = false
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -44,29 +59,61 @@ class ProfileFragment : Fragment() {
         preferenceManager = PreferenceManager(requireContext())
         loadProfileData()
         setupListeners()
+        setupObservers()
+        animateUI()
+    }
+
+    private fun animateUI() {
+        binding.cardHeader.translationY = -300f
+        binding.cardHeader.animate().translationY(0f).setDuration(600).setInterpolator(DecelerateInterpolator()).start()
+        
+        binding.layoutAiSummary.alpha = 0f
+        binding.layoutAiSummary.animate().alpha(1f).setStartDelay(400).setDuration(600).start()
+        
+        binding.layoutForm.alpha = 0f
+        binding.layoutForm.translationY = 100f
+        binding.layoutForm.animate().alpha(1f).translationY(0f).setStartDelay(600).setDuration(600).start()
     }
 
     private fun loadProfileData() {
-        if (preferenceManager.isProfileCompleted()) {
-            binding.etName.setText(preferenceManager.getUserName())
-            binding.etMobile.setText(preferenceManager.getMobileNumber())
-            binding.etIncome.setText(preferenceManager.getMonthlyIncome().toString())
-            binding.etSavingsGoal.setText(preferenceManager.getSavingsGoal().toString())
-            binding.switchBiometric.isChecked = preferenceManager.isBiometricEnabled()
-            
-            val profileUrl = preferenceManager.getProfilePicUrl()
-            if (!profileUrl.isNullOrEmpty()) {
+        val name = preferenceManager.getUserName()
+        binding.etName.setText(name)
+        binding.tvDisplayUserName.text = name
+        binding.etIncome.setText(preferenceManager.getMonthlyIncome().toString())
+        binding.etSavingsGoal.setText(preferenceManager.getSavingsGoal().toString())
+        binding.switchBiometric.isChecked = preferenceManager.isBiometricEnabled()
+        
+        updateProfileImage()
+    }
+
+    private fun updateProfileImage() {
+        val profileUrl = preferenceManager.getProfilePicUrl()
+        if (!profileUrl.isNullOrEmpty()) {
+            if (profileUrl.startsWith("http")) {
                 Glide.with(this)
                     .load(profileUrl)
-                    .placeholder(android.R.drawable.ic_menu_camera)
-                    .error(android.R.drawable.ic_menu_report_image)
+                    .centerCrop()
+                    .placeholder(R.drawable.ic_app_logo)
                     .into(binding.ivProfilePic)
+            } else {
+                val file = File(profileUrl)
+                if (file.exists()) {
+                    Glide.with(this)
+                        .load(file)
+                        .centerCrop()
+                        .placeholder(R.drawable.ic_app_logo)
+                        .into(binding.ivProfilePic)
+                }
             }
         }
     }
 
     private fun setupListeners() {
-        binding.ivProfilePic.setOnClickListener {
+        binding.btnToggleEdit.setOnClickListener {
+            toggleEditMode()
+        }
+
+        binding.fabEditPhoto.setOnClickListener {
             requestPermissionAndPickImage()
         }
 
@@ -74,11 +121,93 @@ class ProfileFragment : Fragment() {
             saveData()
         }
 
-        binding.btnLogout.setOnClickListener {
-            auth.signOut()
-            startActivity(Intent(requireContext(), LoginActivity::class.java))
-            requireActivity().finishAffinity()
+        binding.btnExportData.setOnClickListener {
+            val expenses = viewModel.allExpenses.value ?: emptyList()
+            com.smartwallet.ai.utils.ExportHelper.exportExpensesToCSV(requireContext(), expenses)
         }
+
+        binding.btnPrivacy.setOnClickListener {
+            val browserIntent = Intent(Intent.ACTION_VIEW, Uri.parse("https://smartwallet.ai/privacy"))
+            startActivity(browserIntent)
+        }
+
+        binding.btnLogout.setOnClickListener {
+            it.animate().scaleX(0.95f).scaleY(0.95f).setDuration(100).withEndAction {
+                it.animate().scaleX(1f).scaleY(1f).setDuration(100).start()
+                showLogoutConfirmation()
+            }.start()
+        }
+    }
+
+    private fun toggleEditMode() {
+        isEditMode = !isEditMode
+        
+        // Update Button UI
+        if (isEditMode) {
+            binding.btnToggleEdit.text = "Cancel"
+            binding.btnToggleEdit.setIconResource(R.drawable.ic_search) // Using search as a close/cancel icon for now
+            binding.btnSaveProfile.visibility = View.VISIBLE
+            binding.fabEditPhoto.visibility = View.VISIBLE
+        } else {
+            binding.btnToggleEdit.text = "Edit Profile"
+            binding.btnToggleEdit.setIconResource(R.drawable.ic_edit_modern)
+            binding.btnSaveProfile.visibility = View.GONE
+            binding.fabEditPhoto.visibility = View.GONE
+            loadProfileData() // Reset data
+        }
+
+        // Enable/Disable Fields
+        binding.tilName.isEnabled = isEditMode
+        binding.tilIncome.isEnabled = isEditMode
+        binding.tilSavingsGoal.isEnabled = isEditMode
+        binding.switchBiometric.isEnabled = isEditMode
+    }
+
+    private fun showLogoutConfirmation() {
+        AlertDialog.Builder(requireContext())
+            .setTitle("Logout")
+            .setMessage("Are you sure you want to logout? This will allow you to sign in with a different account.")
+            .setPositiveButton("Yes") { _, _ ->
+                // 1. Sign out from Firebase
+                auth.signOut()
+                
+                // 2. Sign out from Google to clear the "Auto-select" session
+                val gso = GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN)
+                    .requestIdToken(getString(R.string.default_web_client_id))
+                    .requestEmail()
+                    .build()
+                GoogleSignIn.getClient(requireActivity(), gso).signOut()
+                
+                // 3. Clear local preferences
+                preferenceManager.clearData()
+
+                startActivity(Intent(requireContext(), LoginActivity::class.java))
+                requireActivity().finishAffinity()
+            }
+            .setNegativeButton("No", null)
+            .show()
+    }
+
+    private fun setupObservers() {
+        val income = preferenceManager.getMonthlyIncome()
+        val goal = preferenceManager.getSavingsGoal()
+        
+        viewModel.calculateInsights(income, goal)
+        viewModel.advancedInsights.observe(viewLifecycleOwner) { data ->
+            updateAiQuickSummary(data)
+        }
+    }
+
+    private fun updateAiQuickSummary(data: AIInsightData) {
+        binding.tvQuickHealth.text = String.format(Locale.getDefault(), "%d%%", data.healthScore)
+        binding.tvQuickScore.text = (data.healthScore * 10).toString()
+        binding.tvUserPersonalityTag.text = data.financialPersonality.name.replace("_", " ").lowercase()
+            .replaceFirstChar { if (it.isLowerCase()) it.titlecase(Locale.getDefault()) else it.toString() }
+        
+        val calendar = Calendar.getInstance()
+        val daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH)
+        val currentDay = calendar.get(Calendar.DAY_OF_MONTH)
+        binding.tvQuickDays.text = (daysInMonth - currentDay).toString()
     }
 
     private fun requestPermissionAndPickImage() {
@@ -89,81 +218,124 @@ class ProfileFragment : Fragment() {
         }
 
         if (ContextCompat.checkSelfPermission(requireContext(), permission) == PackageManager.PERMISSION_GRANTED) {
-            // Permission already granted, open image picker
             imagePickerLauncher.launch("image/*")
         } else {
-            // Request permission
             permissionLauncher.launch(permission)
         }
     }
 
     private val permissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
-        if (isGranted) {
-            // Permission granted, open image picker
-            imagePickerLauncher.launch("image/*")
-        } else {
-            Toast.makeText(
-                requireContext(),
-                "Permission denied. Cannot access gallery.",
-                Toast.LENGTH_SHORT
-            ).show()
-        }
+        if (isGranted) imagePickerLauncher.launch("image/*")
+        else Toast.makeText(requireContext(), "Permission denied", Toast.LENGTH_SHORT).show()
     }
 
     private val imagePickerLauncher = registerForActivityResult(ActivityResultContracts.GetContent()) { uri: Uri? ->
-        if (uri != null) {
-            saveProfileImageLocally(uri)
-        } else {
-            Toast.makeText(requireContext(), "No image selected", Toast.LENGTH_SHORT).show()
+        uri?.let { 
+            saveProfileImageLocally(it) 
+            uploadProfileImageToCloud(it)
+        }
+    }
+
+    private fun uploadProfileImageToCloud(uri: Uri) {
+        val uid = auth.currentUser?.uid ?: return
+        lifecycleScope.launch {
+            val cloudUrl = FirestoreManager.uploadProfilePicture(uid, uri)
+            if (cloudUrl != null) {
+                preferenceManager.setProfilePicUrl(cloudUrl)
+                Log.d("ProfileCloud", "Image uploaded: $cloudUrl")
+            }
         }
     }
 
     private fun saveProfileImageLocally(uri: Uri) {
         try {
             val inputStream = requireContext().contentResolver.openInputStream(uri)
-            if (inputStream != null) {
+            inputStream?.use { input ->
                 val directory = File(requireContext().filesDir, "profile_pics")
-                if (!directory.exists()) {
-                    directory.mkdirs()
+                if (!directory.exists()) directory.mkdirs()
+
+                // Delete old profile pictures to save space
+                directory.listFiles()?.forEach { it.delete() }
+
+                // Create a unique filename to bypass Glide's cache
+                val fileName = "profile_${System.currentTimeMillis()}.jpg"
+                val file = File(directory, fileName)
+
+                FileOutputStream(file).use { output ->
+                    input.copyTo(output)
                 }
 
-                val file = File(directory, "profile_picture.jpg")
-                val outputStream = FileOutputStream(file)
-                inputStream.copyTo(outputStream)
-                inputStream.close()
-                outputStream.close()
-
-                val localPath = file.absolutePath
-                preferenceManager.setProfilePicUrl(localPath)
-
-                Glide.with(this)
-                    .load(file)
-                    .centerCrop()
-                    .into(binding.ivProfilePic)
-
-                Toast.makeText(requireContext(), "Profile picture updated locally!", Toast.LENGTH_SHORT).show()
+                preferenceManager.setProfilePicUrl(file.absolutePath)
+                updateProfileImage()
+                Toast.makeText(requireContext(), "Photo updated everywhere!", Toast.LENGTH_SHORT).show()
             }
         } catch (e: Exception) {
-            Log.e("ProfileLocal", "Error saving image: ${e.message}", e)
-            Toast.makeText(requireContext(), "Failed to save image: ${e.message}", Toast.LENGTH_SHORT).show()
+            Log.e("Profile", "Error saving image", e)
         }
     }
 
     private fun saveData() {
         val name = binding.etName.text.toString()
-        val mobile = binding.etMobile.text.toString()
         val income = binding.etIncome.text.toString().toDoubleOrNull() ?: 0.0
-        val savingsGoal = binding.etSavingsGoal.text.toString().toDoubleOrNull() ?: 0.0
+        val goal = binding.etSavingsGoal.text.toString().toDoubleOrNull() ?: 0.0
         val biometric = binding.switchBiometric.isChecked
-
+        
         if (name.isNotEmpty() && income > 0) {
-            preferenceManager.saveProfile(name, mobile, income, savingsGoal, 1, "PKR")
-            preferenceManager.setBiometricEnabled(biometric)
-            
-            Toast.makeText(requireContext(), "Profile Updated Successfully!", Toast.LENGTH_SHORT).show()
+            val user = auth.currentUser
+            if (user != null) {
+                val profile = UserProfile(
+                    uid = user.uid,
+                    name = name,
+                    monthlyIncome = income,
+                    savingsGoal = goal,
+                    profilePicUrl = preferenceManager.getProfilePicUrl(),
+                    profileCompleted = true
+                )
+
+                lifecycleScope.launch {
+                    try {
+                        showLoading(true)
+                        
+                        // 1. Save locally first (Ensures biometric state is stored immediately)
+                        preferenceManager.saveProfile(name, "", income, goal, 1, "PKR")
+                        preferenceManager.setBiometricEnabled(biometric)
+                        binding.tvDisplayUserName.text = name
+                        
+                        // 2. Try to sync with Cloud
+                        val success = FirestoreManager.saveUserProfile(profile)
+                        
+                        showLoading(false)
+                        if (success) {
+                            Toast.makeText(requireContext(), "Universe Synchronized Successfully! ✨", Toast.LENGTH_SHORT).show()
+                        } else {
+                            // Local data is safe, only cloud sync failed
+                            Toast.makeText(requireContext(), "Saved locally. Cloud sync pending (Offline) ☁️", Toast.LENGTH_LONG).show()
+                        }
+                        
+                        toggleEditMode() // Exit edit mode
+                    } catch (e: Exception) {
+                        showLoading(false)
+                        Log.e("ProfileSync", "Sync failed", e)
+                        Toast.makeText(requireContext(), "Error saving: ${e.message}", Toast.LENGTH_SHORT).show()
+                        toggleEditMode()
+                    }
+                }
+            }
         } else {
-            Toast.makeText(requireContext(), "Please enter name and monthly income", Toast.LENGTH_SHORT).show()
+            Toast.makeText(requireContext(), "Please enter valid name and income", Toast.LENGTH_SHORT).show()
         }
+    }
+
+    private fun showLoading(show: Boolean) {
+        if (show) {
+            binding.loadingOverlay.visibility = View.VISIBLE
+            val rotate = android.view.animation.AnimationUtils.loadAnimation(requireContext(), R.anim.rotate_universe)
+            binding.root.findViewById<View>(R.id.ivLoadingLogo)?.startAnimation(rotate)
+        } else {
+            binding.loadingOverlay.visibility = View.GONE
+            binding.root.findViewById<View>(R.id.ivLoadingLogo)?.clearAnimation()
+        }
+        binding.btnSaveProfile.isEnabled = !show
     }
 
     override fun onDestroyView() {
@@ -171,4 +343,3 @@ class ProfileFragment : Fragment() {
         _binding = null
     }
 }
-

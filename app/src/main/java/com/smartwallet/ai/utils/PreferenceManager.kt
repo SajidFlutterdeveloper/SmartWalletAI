@@ -27,6 +27,17 @@ class PreferenceManager(context: Context) {
     fun getCurrency(): String = prefs.getString("currency", "PKR") ?: "PKR"
     fun isProfileCompleted(): Boolean = prefs.getBoolean("profile_completed", false)
 
+    // Savings Isolation (Accumulated Savings)
+    fun getAccumulatedSavings(): Double = prefs.getLong("accumulated_savings", 0L).toDouble()
+    fun addAccumulatedSavings(amount: Double) {
+        val current = getAccumulatedSavings()
+        prefs.edit().putLong("accumulated_savings", (current + amount).toLong()).apply()
+    }
+    fun withdrawAccumulatedSavings(amount: Double) {
+        val current = getAccumulatedSavings()
+        prefs.edit().putLong("accumulated_savings", (current - amount).coerceAtLeast(0.0).toLong()).apply()
+    }
+
     // New Security Settings
     fun setBiometricEnabled(enabled: Boolean) {
         prefs.edit().putBoolean("biometric_enabled", enabled).apply()
@@ -38,4 +49,8 @@ class PreferenceManager(context: Context) {
         prefs.edit().putString("profile_pic_url", url).apply()
     }
     fun getProfilePicUrl(): String? = prefs.getString("profile_pic_url", null)
+
+    fun clearData() {
+        prefs.edit().clear().apply()
+    }
 }
