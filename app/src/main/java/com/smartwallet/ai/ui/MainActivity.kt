@@ -109,7 +109,9 @@ class MainActivity : AppCompatActivity() {
 
     private fun setupFab() {
         binding.fabAdd.setOnClickListener {
-            binding.fabAdd.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+            try {
+                binding.fabAdd.performHapticFeedback(android.view.HapticFeedbackConstants.LONG_PRESS)
+            } catch (e: Exception) {}
             
             // Animation for FAB
             binding.fabAdd.animate()
@@ -137,7 +139,9 @@ class MainActivity : AppCompatActivity() {
         binding.bottomNavigation.setOnItemSelectedListener { item ->
             if (item.itemId != navController.currentDestination?.id) {
                 // Haptic feedback
-                binding.bottomNavigation.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                try {
+                    binding.bottomNavigation.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+                } catch (e: Exception) {}
 
                 // Bounce animation for icon
                 val itemView = binding.bottomNavigation.findViewById<View>(item.itemId)

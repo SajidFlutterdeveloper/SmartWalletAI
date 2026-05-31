@@ -250,10 +250,12 @@ class AddTransactionActivity : AppCompatActivity() {
                     if (editingExpense != null) viewModel.updateExpense(expense)
                     else viewModel.addExpense(expense)
 
+                try {
                     // Haptic Feedback & Success
                     binding.root.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
-                    Toast.makeText(this@AddTransactionActivity, "Universe Synchronized Successfully!", Toast.LENGTH_SHORT).show()
-                    finish()
+                } catch (e: Exception) {}
+                Toast.makeText(this@AddTransactionActivity, "Universe Synchronized Successfully!", Toast.LENGTH_SHORT).show()
+                finish()
                 } catch (e: Exception) {
                     Toast.makeText(this@AddTransactionActivity, "Error: ${e.message}", Toast.LENGTH_SHORT).show()
                 } finally {

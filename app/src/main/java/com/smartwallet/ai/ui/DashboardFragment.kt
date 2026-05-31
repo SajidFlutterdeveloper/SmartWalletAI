@@ -82,12 +82,16 @@ class DashboardFragment : Fragment() {
         }
 
         binding.btnDownloadReport.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            try {
+                it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            } catch (e: Exception) {}
             exportCSV("This Month")
         }
 
         binding.btnStatement.setOnClickListener {
-            it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            try {
+                it.performHapticFeedback(android.view.HapticFeedbackConstants.VIRTUAL_KEY)
+            } catch (e: Exception) {}
             showStatementFilter()
         }
     }

@@ -283,9 +283,11 @@ object AIInsightEngine {
         val insights = mutableListOf<SpendingInsight>()
         
         categoryTotals.forEach { (cat, amount) ->
-            val percentageOfIncome = (amount / income) * 100
-            if (percentageOfIncome > 20) {
-                insights.add(SpendingInsight(cat, "Your $cat spending has consumed ${percentageOfIncome.toInt()}% of your income. Consider a tighter limit.", "UP"))
+            if (income > 0) {
+                val percentageOfIncome = (amount / income) * 100
+                if (percentageOfIncome > 20) {
+                    insights.add(SpendingInsight(cat, "Your $cat spending has consumed ${percentageOfIncome.toInt()}% of your income. Consider a tighter limit.", "UP"))
+                }
             }
         }
 
@@ -312,8 +314,12 @@ object AIInsightEngine {
         val estimatedTotal = (burnRate * totalDays) * 1.02 // 2% buffer for variance
         
         val prob = when {
+            income <= 0 -> 0
             spent >= income -> 0
-            spent > spendingLimit -> (100 - ((spent / income) * 100)).toInt().coerceIn(0, 10)
+            spent > spendingLimit -> {
+                val ratio = spent / income
+                (100 - (ratio * 100)).toInt().coerceIn(0, 10)
+            }
             estimatedTotal <= spendingLimit -> 98
             estimatedTotal <= spendingLimit * 1.05 -> 80
             estimatedTotal <= income -> 40

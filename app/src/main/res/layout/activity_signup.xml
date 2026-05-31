@@ -1,225 +1,231 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.core.widget.NestedScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/white"
-    android:fillViewport="true">
+    android:background="@color/white">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <androidx.core.widget.NestedScrollView
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:paddingBottom="32dp">
+        android:layout_height="match_parent"
+        android:fillViewport="true">
 
-        <View
-            android:id="@+id/topGradient"
-            android:layout_width="match_parent"
-            android:layout_height="220dp"
-            android:background="@drawable/bg_main_gradient"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/tvTitle"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="64dp"
-            android:text="Create Account"
-            android:textColor="@color/white"
-            android:textSize="28sp"
-            android:textStyle="bold"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Start your AI financial journey today"
-            android:textColor="@color/white"
-            android:alpha="0.8"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
-
-        <com.google.android.material.card.MaterialCardView
-            android:id="@+id/cardSignup"
+        <androidx.constraintlayout.widget.ConstraintLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:layout_marginHorizontal="24dp"
-            android:layout_marginTop="-40dp"
-            app:cardCornerRadius="24dp"
-            app:cardElevation="8dp"
-            app:layout_constraintTop_toBottomOf="@+id/topGradient">
+            android:paddingBottom="32dp">
 
-            <LinearLayout
+            <View
+                android:id="@+id/topGradient"
+                android:layout_width="match_parent"
+                android:layout_height="220dp"
+                android:background="@drawable/bg_main_gradient"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/tvTitle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="64dp"
+                android:text="Create Account"
+                android:textColor="@color/white"
+                android:textSize="28sp"
+                android:textStyle="bold"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Start your AI financial journey today"
+                android:textColor="@color/white"
+                android:alpha="0.8"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/tvTitle" />
+
+            <com.google.android.material.card.MaterialCardView
+                android:id="@+id/cardSignup"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical"
-                android:padding="24dp">
+                android:layout_marginHorizontal="24dp"
+                android:layout_marginTop="-40dp"
+                app:cardCornerRadius="24dp"
+                app:cardElevation="8dp"
+                app:layout_constraintTop_toBottomOf="@+id/topGradient">
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
+                <LinearLayout
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Email Address"
-                    app:startIconDrawable="@drawable/ic_edit_modern"
-                    android:layout_marginBottom="12dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etEmail"
+                    android:orientation="vertical"
+                    android:padding="24dp">
+
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textEmailAddress" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:hint="Email Address"
+                        app:startIconDrawable="@drawable/ic_edit_modern"
+                        android:layout_marginBottom="12dp">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etEmail"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textEmailAddress" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Create Password"
-                    app:startIconDrawable="@drawable/ic_search"
-                    app:passwordToggleEnabled="true"
-                    android:layout_marginBottom="12dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etPassword"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:hint="Create Password"
+                        app:startIconDrawable="@drawable/ic_search"
+                        app:passwordToggleEnabled="true"
+                        android:layout_marginBottom="12dp">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.textfield.TextInputLayout
-                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="Confirm Password"
-                    app:startIconDrawable="@drawable/ic_search"
-                    app:passwordToggleEnabled="true"
-                    android:layout_marginBottom="24dp">
-                    <com.google.android.material.textfield.TextInputEditText
-                        android:id="@+id/etConfirmPassword"
+                    <com.google.android.material.textfield.TextInputLayout
+                        style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
-                        android:inputType="textPassword" />
-                </com.google.android.material.textfield.TextInputLayout>
+                        android:hint="Confirm Password"
+                        app:startIconDrawable="@drawable/ic_search"
+                        app:passwordToggleEnabled="true"
+                        android:layout_marginBottom="24dp">
+                        <com.google.android.material.textfield.TextInputEditText
+                            android:id="@+id/etConfirmPassword"
+                            android:layout_width="match_parent"
+                            android:layout_height="wrap_content"
+                            android:inputType="textPassword" />
+                    </com.google.android.material.textfield.TextInputLayout>
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnSignup"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:text="Register"
-                    android:textStyle="bold"
-                    app:cornerRadius="16dp"/>
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnSignup"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:text="Register"
+                        android:textStyle="bold"
+                        app:cornerRadius="16dp"/>
+
+                    <TextView
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/text_or"
+                        android:layout_gravity="center"
+                        android:layout_marginVertical="16dp"
+                        android:textColor="@color/text_secondary" />
+
+                    <com.google.android.material.button.MaterialButton
+                        android:id="@+id/btnGoogleSignup"
+                        style="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                        android:layout_width="match_parent"
+                        android:layout_height="60dp"
+                        android:text="@string/signup_with_google"
+                        app:icon="@drawable/ic_search"
+                        app:iconGravity="textStart"
+                        app:cornerRadius="16dp"
+                        android:textColor="@color/primary"
+                        app:strokeColor="@color/primary"/>
+
+                </LinearLayout>
+            </com.google.android.material.card.MaterialCardView>
+
+            <LinearLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="24dp"
+                android:orientation="horizontal"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/cardSignup">
 
                 <TextView
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="@string/text_or"
-                    android:layout_gravity="center"
-                    android:layout_marginVertical="16dp"
+                    android:text="Already have an account?"
                     android:textColor="@color/text_secondary" />
 
-                <com.google.android.material.button.MaterialButton
-                    android:id="@+id/btnGoogleSignup"
-                    style="@style/Widget.MaterialComponents.Button.OutlinedButton"
-                    android:layout_width="match_parent"
-                    android:layout_height="60dp"
-                    android:text="@string/signup_with_google"
-                    app:icon="@drawable/ic_search"
-                    app:iconGravity="textStart"
-                    app:cornerRadius="16dp"
+                <TextView
+                    android:id="@+id/tvGoToLogin"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:text="Login Now"
                     android:textColor="@color/primary"
-                    app:strokeColor="@color/primary"/>
-
+                    android:textStyle="bold" />
             </LinearLayout>
-        </com.google.android.material.card.MaterialCardView>
 
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </androidx.core.widget.NestedScrollView>
+
+    <FrameLayout
+        android:id="@+id/loadingOverlay"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="#D9000000"
+        android:visibility="gone"
+        android:clickable="true"
+        android:focusable="true">
         <LinearLayout
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="24dp"
-            android:orientation="horizontal"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/cardSignup">
+            android:layout_gravity="center"
+            android:gravity="center"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="100dp"
+                android:layout_height="100dp">
+
+                <View
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:background="@drawable/circular_progress_drawable"
+                    android:alpha="0.3"/>
+
+                <com.google.android.material.imageview.ShapeableImageView
+                    android:id="@+id/ivLoadingLogo"
+                    android:layout_width="60dp"
+                    android:layout_height="60dp"
+                    android:layout_centerInParent="true"
+                    android:src="@drawable/ic_app_logo"
+                    app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"/>
+
+                <ProgressBar
+                    android:layout_width="match_parent"
+                    android:layout_height="match_parent"
+                    android:indeterminate="true"
+                    android:indeterminateTint="@color/primary"
+                    android:indeterminateTintMode="src_atop"
+                    style="@style/Widget.AppCompat.ProgressBar"/>
+            </RelativeLayout>
 
             <TextView
+                android:id="@+id/tvLoadingMessage"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Already have an account?"
-                android:textColor="@color/text_secondary" />
-
-            <TextView
-                android:id="@+id/tvGoToLogin"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="4dp"
-                android:text="Login Now"
-                android:textColor="@color/primary"
+                android:layout_marginTop="24dp"
+                android:text="Creating Universe..."
+                android:textColor="@color/white"
+                android:textSize="16sp"
+                android:letterSpacing="0.1"
                 android:textStyle="bold" />
-        </LinearLayout>
 
-        <FrameLayout
-            android:id="@+id/loadingOverlay"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:background="#D9000000"
-            android:visibility="gone"
-            android:clickable="true"
-            android:focusable="true">
-            <LinearLayout
+            <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center"
-                android:gravity="center"
-                android:orientation="vertical">
+                android:layout_marginTop="8dp"
+                android:text="Initializing AI Ledger"
+                android:textColor="@color/white"
+                android:alpha="0.6"
+                android:textSize="12sp" />
+        </LinearLayout>
+    </FrameLayout>
 
-                <RelativeLayout
-                    android:layout_width="100dp"
-                    android:layout_height="100dp">
-
-                    <View
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:background="@drawable/circular_progress_drawable"
-                        android:alpha="0.3"/>
-
-                    <com.google.android.material.imageview.ShapeableImageView
-                        android:id="@+id/ivLoadingLogo"
-                        android:layout_width="60dp"
-                        android:layout_height="60dp"
-                        android:layout_centerInParent="true"
-                        android:src="@drawable/ic_app_logo"
-                        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"/>
-
-                    <ProgressBar
-                        android:layout_width="match_parent"
-                        android:layout_height="match_parent"
-                        android:indeterminate="true"
-                        android:indeterminateTint="@color/primary"
-                        android:indeterminateTintMode="src_atop"
-                        style="@style/Widget.AppCompat.ProgressBar"/>
-                </RelativeLayout>
-
-                <TextView
-                    android:id="@+id/tvLoadingMessage"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="24dp"
-                    android:text="Creating Universe..."
-                    android:textColor="@color/white"
-                    android:textSize="16sp"
-                    android:letterSpacing="0.1"
-                    android:textStyle="bold" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
-                    android:text="Initializing AI Ledger"
-                    android:textColor="@color/white"
-                    android:alpha="0.6"
-                    android:textSize="12sp" />
-            </LinearLayout>
-        </FrameLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</androidx.core.widget.NestedScrollView>
+</FrameLayout>

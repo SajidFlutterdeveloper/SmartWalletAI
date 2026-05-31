@@ -43,6 +43,7 @@ class LoginActivity : AppCompatActivity() {
         }
 
         binding.btnGoogleLogin.setOnClickListener {
+            showLoading(true)
             googleSignInLauncher.launch(googleSignInClient.signInIntent)
         }
 
@@ -153,12 +154,15 @@ class LoginActivity : AppCompatActivity() {
                 if (idToken != null) {
                     firebaseAuthWithGoogle(idToken)
                 } else {
+                    showLoading(false)
                     Toast.makeText(this, "Google Error: ID Token is null. Check Web Client ID in strings.xml", Toast.LENGTH_LONG).show()
                 }
             } catch (e: ApiException) {
+                showLoading(false)
                 Toast.makeText(this, "Google Sign In Failed: ${e.statusCode}\nCheck SHA-1 and Client ID configuration.", Toast.LENGTH_LONG).show()
             }
         } else {
+            showLoading(false)
             Toast.makeText(this, "Sign-in cancelled or failed (Code: ${result.resultCode})", Toast.LENGTH_SHORT).show()
         }
     }
