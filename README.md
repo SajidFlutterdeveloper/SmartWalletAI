@@ -55,4 +55,4 @@ This project was developed by a team of two as a Semester Project.
 *   **Project Repository:** [SmartWalletAI (Current Repo)](https://github.com/SajidFlutterdeveloper/SmartWalletAI)
 
 ---
-© 2024 Sajid Ali & Shahzad Ali. All Rights Reserved.
+© 2026 Sajid Ali & Shahzad Ali. All Rights Reserved.
