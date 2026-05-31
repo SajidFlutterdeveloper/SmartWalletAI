@@ -107,6 +107,7 @@ object AIInsightEngine {
     }
 
     private fun calculateVelocity(expenses: List<Expense>): Double {
+        if (expenses.isEmpty()) return 0.0
         val now = System.currentTimeMillis()
         val oneWeekAgo = now - TimeUnit.DAYS.toMillis(7)
         val twoWeeksAgo = now - TimeUnit.DAYS.toMillis(14)
@@ -114,12 +115,16 @@ object AIInsightEngine {
         val thisWeekTotal = expenses.filter { it.date in oneWeekAgo..now }.sumOf { it.amount }
         val lastWeekTotal = expenses.filter { it.date in twoWeeksAgo..oneWeekAgo }.sumOf { it.amount }
 
-        if (lastWeekTotal <= 0.0) return 0.0
+        if (lastWeekTotal <= 0.0) {
+            return if (thisWeekTotal > 0) 100.0 else 0.0
+        }
         return ((thisWeekTotal - lastWeekTotal) / lastWeekTotal) * 100
     }
 
     private fun calculateNoSpendStreak(expenses: List<Expense>): Int {
         if (expenses.isEmpty()) return 0
+        
+        // Normalize dates to start of day for accurate comparison
         val sortedDates = expenses.map {
             val cal = Calendar.getInstance()
             cal.timeInMillis = it.date
@@ -130,7 +135,6 @@ object AIInsightEngine {
             cal.timeInMillis
         }.distinct().sortedDescending()
 
-        var streak = 0
         val today = Calendar.getInstance().apply {
             set(Calendar.HOUR_OF_DAY, 0)
             set(Calendar.MINUTE, 0)
@@ -138,16 +142,13 @@ object AIInsightEngine {
             set(Calendar.MILLISECOND, 0)
         }.timeInMillis
 
-        var checkDate = today
-        
-        // If today has expenses, the no-spend streak is 0. 
-        // We start counting from yesterday back to the first day with an expense.
-        if (sortedDates.contains(today)) {
-            return 0
-        }
+        // If spent today, streak is 0
+        if (sortedDates.contains(today)) return 0
 
-        checkDate -= TimeUnit.DAYS.toMillis(1)
-        while (checkDate >= 0) {
+        var streak = 0
+        var checkDate = today - TimeUnit.DAYS.toMillis(1)
+        
+        while (checkDate > 0) {
             if (sortedDates.contains(checkDate)) {
                 break
             }

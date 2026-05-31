@@ -33,6 +33,8 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
     val spendingForecast = MutableLiveData<Double>()
     private val preferenceManager = PreferenceManager(application)
 
+    private val mediatorObserver = androidx.lifecycle.Observer<Any?> { triggerInsights() }
+
     init {
         val database = AppDatabase.getDatabase(application)
         repository = FinancialRepository(database.expenseDao(), database.monthlyTargetDao())
@@ -53,7 +55,11 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         totalExpensesThisMonth = repository.getTotalExpensesThisMonth(userId, monthStart)
         monthlyTargets = repository.getAllTargets(userId)
         
-        setupAlertObserver()
+        // Start observing for internal logic
+        allExpenses.observeForever(mediatorObserver)
+        expensesThisMonth.observeForever(mediatorObserver)
+        totalExpensesThisMonth.observeForever(mediatorObserver)
+        
         checkAndInitializeMonthlyTarget()
     }
 
@@ -78,25 +84,21 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         }
     }
 
-    private fun setupAlertObserver() {
-        totalExpensesThisMonth.observeForever { total ->
-            val spent = total ?: 0.0
-            val income = preferenceManager.getMonthlyIncome()
-            val savingsGoal = preferenceManager.getSavingsGoal()
+    private fun triggerInsights() {
+        val income = preferenceManager.getMonthlyIncome()
+        val goal = preferenceManager.getSavingsGoal()
+        if (income > 0) {
+            calculateInsights(income, goal)
             
-            if (income > 0) {
-                val context = getApplication<Application>().applicationContext
-                val health = BudgetCalculator.getSpendingHealth(income, savingsGoal, spent)
-                
-                // Real-time dynamic alerts based on AI engine
-                AIInsightEngine.generateSmartAlert(spent, income, savingsGoal, health)?.let { (title, message) ->
-                    NotificationHelper.sendNotification(context, title, message)
-                }
-
-                // Auto-calculate insights on every change
-                calculateInsights(income, savingsGoal)
-                updateActualSavings()
+            // Handle Alerts & Savings Update
+            val spent = totalExpensesThisMonth.value ?: 0.0
+            val context = getApplication<Application>().applicationContext
+            val health = BudgetCalculator.getSpendingHealth(income, goal, spent)
+            
+            AIInsightEngine.generateSmartAlert(spent, income, goal, health)?.let { (title, message) ->
+                NotificationHelper.sendNotification(context, title, message)
             }
+            updateActualSavings()
         }
     }
 
@@ -126,14 +128,7 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         
         target?.let {
             val actual = (income - spent).coerceAtLeast(0.0)
-            
-            // If month is ended or we want to isolate savings periodically
-            // For now, we update the monthly target record
             repository.updateTarget(it.copy(actualSavings = actual))
-            
-            // Requirement 4: Auto-isolate savings if goal is reached or month ends
-            // In a real app, this would happen on the last day of the month.
-            // For demo, we ensure the 'Accumulated Savings' in PreferenceManager reflects the 'Actual Savings' of closed months.
         }
     }
 
@@ -154,7 +149,15 @@ class ExpenseViewModel(application: Application) : AndroidViewModel(application)
         advancedInsights.postValue(aiData)
         aiFeed.postValue(AIInsightEngine.generateAIFeed(aiData))
         
-        // Use the Dynamic Forecast from the engine (estimated total month end spend)
+        // Use the Dynamic Forecast from the engine
         spendingForecast.postValue(aiData.survivalPrediction.estimatedTotalSpend)
+    }
+
+    override fun onCleared() {
+        super.onCleared()
+        // Prevent memory leaks
+        allExpenses.removeObserver(mediatorObserver)
+        expensesThisMonth.removeObserver(mediatorObserver)
+        totalExpensesThisMonth.removeObserver(mediatorObserver)
     }
 }

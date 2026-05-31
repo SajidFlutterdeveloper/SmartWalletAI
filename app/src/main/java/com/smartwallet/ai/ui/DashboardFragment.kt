@@ -279,20 +279,18 @@ class DashboardFragment : Fragment() {
             binding.tvStreak.text = "${data.noSpendStreak} Days"
             binding.tvStreak.setTextColor(androidx.core.content.ContextCompat.getColor(requireContext(),
                 if (data.noSpendStreak >= 1) R.color.success else R.color.text_main))
+
+            // Forecast Label
+            binding.tvForecastLabel.text = data.survivalPrediction.message
+            binding.tvForecastLabel.setTextColor(
+                androidx.core.content.ContextCompat.getColor(requireContext(), 
+                if (data.survivalPrediction.probability > 60) R.color.text_secondary else R.color.danger)
+            )
         }
 
         viewModel.spendingForecast.observe(viewLifecycleOwner) { forecast ->
             val currency = preferenceManager.getCurrency()
             binding.tvForecast.text = "$currency ${formatAmount(forecast)}"
-            
-            // Show dynamic prediction status with full calculation context
-            viewModel.advancedInsights.value?.survivalPrediction?.let { prediction ->
-                binding.tvForecastLabel.text = prediction.message
-                binding.tvForecastLabel.setTextColor(
-                    androidx.core.content.ContextCompat.getColor(requireContext(), 
-                    if (prediction.probability > 60) R.color.text_secondary else R.color.danger)
-                )
-            }
         }
     }
 

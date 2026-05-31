@@ -77,15 +77,17 @@ class MainActivity : AppCompatActivity() {
 
     private fun performSecurityCheck() {
         if (preferenceManager.isBiometricEnabled() && BiometricHelper.isBiometricAvailable(this)) {
+            // Ensure binding is initialized before hiding root
+            if (!::binding.isInitialized) {
+                initUI()
+            }
+            
             // Anti-Peek: Ensure UI is hidden during authentication
             binding.root.visibility = View.GONE
             
             BiometricHelper.showBiometricPrompt(this, onSuccess = {
                 lastAuthTime = System.currentTimeMillis()
                 binding.root.visibility = View.VISIBLE
-                if (!::navController.isInitialized) {
-                    initUI()
-                }
             }, onError = { error ->
                 Toast.makeText(this, "Security Access Denied: $error", Toast.LENGTH_SHORT).show()
                 finish()

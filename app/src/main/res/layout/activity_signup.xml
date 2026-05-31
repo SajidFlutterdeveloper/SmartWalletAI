@@ -105,7 +105,7 @@
                     android:id="@+id/btnSignup"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:text="Register Universe"
+                    android:text="Register"
                     android:textStyle="bold"
                     app:cornerRadius="16dp"/>
 

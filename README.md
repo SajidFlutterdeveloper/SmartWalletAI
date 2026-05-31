@@ -45,7 +45,7 @@ SmartWalletAI/
 For detailed instructions on setting up the developer environment or installing the APK, please refer to the [Installation Guide](docs/INSTALLATION_GUIDE.md).
 
 ## Developer Information
-This project was developed by a team of two as a Final Year Project.
+This project was developed by a team of two as a Semester Project.
 
 *   **Team Members:**
     1.  **Sajid Ali**

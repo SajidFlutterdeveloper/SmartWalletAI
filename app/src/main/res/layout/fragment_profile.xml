@@ -332,7 +332,7 @@
                     android:id="@+id/btnSaveProfile"
                     android:layout_width="match_parent"
                     android:layout_height="60dp"
-                    android:text="Update My Universe"
+                    android:text="Update My Profile"
                     android:layout_marginTop="24dp"
                     app:cornerRadius="16dp"
                     android:textStyle="bold"
