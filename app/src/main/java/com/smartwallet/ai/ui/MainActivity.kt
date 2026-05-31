@@ -77,25 +77,37 @@ class MainActivity : AppCompatActivity() {
 
     private fun performSecurityCheck() {
         if (preferenceManager.isBiometricEnabled() && BiometricHelper.isBiometricAvailable(this)) {
-            // Ensure binding is initialized before hiding root
-            if (!::binding.isInitialized) {
-                initUI()
+            // Anti-Peek: If already initialized, hide it. If not, show empty/locked state first.
+            if (::binding.isInitialized) {
+                binding.root.visibility = View.GONE
+            } else {
+                setContentView(R.layout.layout_locked_state)
+                findViewById<View>(R.id.btnUnlock).setOnClickListener { performSecurityCheck() }
             }
-            
-            // Anti-Peek: Ensure UI is hidden during authentication
-            binding.root.visibility = View.GONE
             
             BiometricHelper.showBiometricPrompt(this, onSuccess = {
                 lastAuthTime = System.currentTimeMillis()
-                binding.root.visibility = View.VISIBLE
+                if (!::binding.isInitialized) {
+                    initUI()
+                } else {
+                    setContentView(binding.root)
+                    binding.root.visibility = View.VISIBLE
+                }
             }, onError = { error ->
-                Toast.makeText(this, "Security Access Denied: $error", Toast.LENGTH_SHORT).show()
-                finish()
+                Toast.makeText(this, "Unlock Required", Toast.LENGTH_SHORT).show()
+                showUnlockScreen()
             })
         } else {
             if (!::binding.isInitialized) {
                 initUI()
             }
+        }
+    }
+
+    private fun showUnlockScreen() {
+        setContentView(R.layout.layout_locked_state)
+        findViewById<View>(R.id.btnUnlock).setOnClickListener {
+            performSecurityCheck()
         }
     }
 

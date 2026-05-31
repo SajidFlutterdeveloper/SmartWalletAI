@@ -1,6 +1,8 @@
 package com.smartwallet.ai.ui
 
+import android.Manifest
 import android.content.Intent
+import android.content.pm.PackageManager
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Bundle
@@ -13,6 +15,7 @@ import android.widget.Toast
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
+import androidx.core.content.ContextCompat
 import androidx.core.content.FileProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
@@ -164,9 +167,30 @@ class AddTransactionActivity : AppCompatActivity() {
     }
 
     private fun launchCamera() {
-        val photoFile = File(getExternalFilesDir("Pictures"), "receipt_${System.currentTimeMillis()}.jpg")
-        photoUri = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile)
-        takePhotoLauncher.launch(photoUri)
+        val permission = Manifest.permission.CAMERA
+        if (ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED) {
+            openCameraIntent()
+        } else {
+            cameraPermissionLauncher.launch(permission)
+        }
+    }
+
+    private val cameraPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { isGranted ->
+        if (isGranted) {
+            openCameraIntent()
+        } else {
+            Toast.makeText(this, "Camera permission is required to scan receipts. App will stay open so you can try again.", Toast.LENGTH_LONG).show()
+        }
+    }
+
+    private fun openCameraIntent() {
+        try {
+            val photoFile = File(getExternalFilesDir("Pictures"), "receipt_${System.currentTimeMillis()}.jpg")
+            photoUri = FileProvider.getUriForFile(this, "${packageName}.provider", photoFile)
+            takePhotoLauncher.launch(photoUri)
+        } catch (e: Exception) {
+            Toast.makeText(this, "Error opening camera: ${e.message}", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private val voiceResultLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
